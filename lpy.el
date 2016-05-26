@@ -639,6 +639,18 @@
               (t
                (python-nav-beginning-of-statement))))))
 
+(defun lpy-clean ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^# =>" nil t)
+      (let ((bnd (lispy--bounds-comment)))
+        (delete-region (car bnd) (cdr bnd))
+        (when (looking-at "\\(\n+\\)#\\*")
+          (delete-region (match-beginning 1)
+                         (match-end 1))
+          (newline))))))
+
 (let ((map lpy-mode-map))
   (define-key map (kbd "]") 'lispy-forward)
   (define-key map (kbd "[") 'lpy-backward)
