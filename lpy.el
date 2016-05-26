@@ -175,8 +175,6 @@
     (add-to-list 'ac-trigger-commands func)
     (unless (memq func mc/cmds-to-run-once)
       (add-to-list 'mc/cmds-to-run-for-all func))
-    (unless (memq func company-no-begin-commands)
-      (add-to-list 'company-begin-commands func))
     (unless (memq func flyspell-delayed-commands)
       (add-to-list 'flyspell-delayed-commands func))
     (define-key keymap (kbd key) func)))
