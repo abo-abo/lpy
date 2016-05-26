@@ -18,6 +18,7 @@
     ("^#\\(\\*\\*\\*\\* .*\\)$" 1 'org-level-4 prepend)
     ("^#\\(\\*\\*\\*\\*\\* .*\\)$" 1 'org-level-5 prepend)
     (lpy-outline-comment-highlight 1 'default prepend)
+    ;; ("^#  \\([^ ].*\\)$" 1 'default prepend)
     ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
 
 (defvar lpy-mode-map (make-sparse-keymap))
