@@ -189,26 +189,27 @@
 (defvar lpy-listp-last nil)
 
 (defun lpy-listp ()
-  (unless (or (memq last-command '(python-indent-dedent-line-backspace
-                                   lpy-parens
-                                   self-insert-command))
-              (and (eq ?\) (char-after))
-                   (eq ?\( (char-before)))
-              (lispy--in-string-or-comment-p))
-    (let (end)
-      (when (save-excursion
-              (let ((forward-sexp-function nil))
-                (ignore-errors
-                  (up-list 1)
-                  (setq end (point))
-                  (and (lispy-after-string-p ")")
-                       (< (point) (point-max))))))
-        (setq lpy-listp-last
-              (cons
-               (save-excursion
-                 (goto-char end)
-                 (forward-list -1))
-               end))))))
+  (ignore-errors
+    (unless (or (memq last-command '(python-indent-dedent-line-backspace
+                                     lpy-parens
+                                     self-insert-command))
+                (and (eq ?\) (char-after))
+                     (eq ?\( (char-before)))
+                (lispy--in-string-or-comment-p))
+      (let (end)
+        (when (save-excursion
+                (let ((forward-sexp-function nil))
+                  (ignore-errors
+                    (up-list 1)
+                    (setq end (point))
+                    (and (lispy-after-string-p ")")
+                         (< (point) (point-max))))))
+          (setq lpy-listp-last
+                (cons
+                 (save-excursion
+                   (goto-char end)
+                   (forward-list -1))
+                 end)))))))
 
 (defun lpy-arg-leftp ()
   (or (eq (point) (1+ (car lpy-listp-last)))
