@@ -575,6 +575,8 @@
                 (forward-sexp))
                ((lpy-arg-leftp)
                 (backward-sexp))))
+        ((lispy--in-string-or-comment-p)
+         (self-insert-command 1))
         (t
          (soap-command))))
 
