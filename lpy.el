@@ -40,16 +40,17 @@
     (setq-local forward-sexp-function nil)))
 
 (defun lpy-outline-comment-highlight (limit)
-  (when (re-search-forward "^#\\(?:[^*]\\|$\\)" limit t)
-    (let* ((pt (point))
-           (success (save-excursion
-                      (and (re-search-backward "^#\\*" nil t)
-                           (null (re-search-forward "^[^#]" pt t))))))
-      (when success
-        (set-match-data (list (line-beginning-position) (line-end-position)
-                              (point) (line-end-position)))
-        (end-of-line)
-        t))))
+  (catch 'done
+    (while (re-search-forward "^#\\(?:[^*\n]\\)" limit t)
+      (let* ((pt (point))
+             (success (save-excursion
+                        (and (re-search-backward "^#\\*" nil t)
+                             (null (re-search-forward "^[^#]" pt t))))))
+        (when success
+          (set-match-data (list (line-beginning-position) (line-end-position)
+                                (point) (line-end-position)))
+          (end-of-line)
+          (throw 'done t))))))
 
 (defun lpy-left-p ()
   (looking-at lispy-left))
