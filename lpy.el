@@ -1,9 +1,9 @@
 ;;; lpy.el --- A lispy interface to Python -*- lexical-binding: t -*-
 
 (require 'lispy)
-(require 'jedi)
+(require 'jedi nil t)
 (require 'soap)
-(require 'flyspell)
+(require 'flyspell nil t)
 
 (defgroup lpy nil
   "List navigation and editing for Python."
