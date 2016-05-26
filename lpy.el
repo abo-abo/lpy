@@ -88,14 +88,17 @@
   (interactive)
   (when (looking-at lispy-outline)
     (let ((lvl (lispy-outline-level)))
-      (goto-char
-       (lispy--outline-end))
-      (unless (looking-back "\n\n")
-        (newline))
-      (insert lispy-outline-header
-              (make-string lvl ?\*)
-              " ")
-      (beginning-of-line))))
+      (condition-case nil
+          (outline-forward-same-level 1)
+        (error (goto-char (point-max))))
+      (while (eq (char-before) ?\n)
+        (delete-char -1))
+      (insert
+       "\n\n"
+       lispy-outline-header
+       (make-string lvl ?\*)
+       " \n")
+      (beginning-of-line 0))))
 
 (defun lpy-tab ()
   (interactive)
