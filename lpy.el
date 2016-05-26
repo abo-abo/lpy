@@ -387,24 +387,25 @@
                (end (region-end))
                (leftp (= (point) (region-beginning)))
                indent)
-           (goto-char beg)
-           (setq indent (concat
-                         "^"
-                         (buffer-substring-no-properties
-                          (line-beginning-position)
-                          (point))))
-           (backward-char)
-           (if (re-search-backward indent (lpy-bof-position) t)
-               (progn
-                 (goto-char (match-end 0))
-                 (while (and
-                         (> (point) (point-min))
-                         (= (point) (line-end-position)))
-                   (forward-line -1))
-                 (lispy--mark (cons (point) (line-end-position))))
-             (lispy--mark (cons beg end)))
-           (when leftp
-             (exchange-point-and-mark))))
+           (unless (= beg (point-min))
+             (goto-char beg)
+             (setq indent (concat
+                           "^"
+                           (buffer-substring-no-properties
+                            (line-beginning-position)
+                            (point))))
+             (backward-char)
+             (if (re-search-backward indent (lpy-bof-position) t)
+                 (progn
+                   (goto-char (match-end 0))
+                   (while (and
+                           (> (point) (point-min))
+                           (= (point) (line-end-position)))
+                     (forward-line -1))
+                   (lispy--mark (cons (point) (line-end-position))))
+               (lispy--mark (cons beg end)))
+             (when leftp
+               (exchange-point-and-mark)))))
         ((looking-at outline-regexp)
          (lispy-up arg))
         ((region-active-p)
