@@ -597,6 +597,8 @@
                       (goto-char pt))
                   (skip-chars-forward ", \n")
                   (backward-char)))))
+        ((lispy--in-string-or-comment-p)
+         (self-insert-command 1))
         (t
          (soap-command))))
 
