@@ -141,10 +141,7 @@
      (interactive)
      (unless (looking-at lispy-outline)
        (lispy--ensure-visible))
-     (cond ((or (region-active-p)
-                (and (lpy-listp)
-                     (or (lpy-arg-leftp)
-                         (lpy-arg-rightp))))
+     (cond ((region-active-p)
             (call-interactively ',def))
 
            ((lispy--in-string-or-comment-p)
