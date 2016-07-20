@@ -413,9 +413,18 @@
         ((lpy-line-left-p)
          (if (bolp)
              (lpy-next-top-level-sexp)
-           (let ((indent (buffer-substring-no-properties
-                          (line-beginning-position)
-                          (1+ (point))))))))))
+           (let (beg end)
+             (save-excursion
+               (forward-char)
+               (python-nav-backward-up-list)
+               (setq beg (point))
+               (python-nav-forward-sexp)
+               (setq end (point)))
+             (let ((indent (buffer-substring-no-properties
+                            (line-beginning-position)
+                            (1+ (point)))))
+               (when (re-search-forward (concat "^" indent "\\b") end t)
+                 (backward-char))))))))
 
 (defun lpy-avy-symbol ()
   (interactive)
