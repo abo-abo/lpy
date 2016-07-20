@@ -494,7 +494,20 @@
                     nil)))))
         ((lpy-line-left-p)
          (if (bolp)
-             (re-search-backward "^[^ \n]" (1+ (lispy--outline-beg)) t)))))
+             (re-search-backward "^[^ \n]" (1+ (lispy--outline-beg)) t)
+           (if (bolp)
+               (lpy-next-top-level-sexp)
+             (let (beg)
+               (save-excursion
+                 (forward-char)
+                 (python-nav-backward-up-list)
+                 (setq beg (point)))
+               (let ((indent (buffer-substring-no-properties
+                              (line-beginning-position)
+                              (1+ (point)))))
+                 (when (re-search-backward (concat "^" indent "\\b") beg t)
+                   (back-to-indentation)
+                   (backward-char)))))))))
 
 (defun lpy-flow ()
   (interactive)
