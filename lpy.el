@@ -536,7 +536,13 @@
   (interactive)
   (cond ((looking-at lispy-outline)
          (lpy-next-top-level-sexp))
-        ((lpy-line-left-p))
+        ((lpy-line-left-p)
+         (let ((bnd (lpy-bounds-defun))
+               (old-pt (point)))
+           (python-nav-forward-block)
+           (if (> (point) (cdr bnd))
+               (goto-char old-pt)
+             (backward-char))))
         (t
          (self-insert-command 1))))
 
