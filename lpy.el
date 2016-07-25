@@ -426,16 +426,31 @@
                (when (re-search-forward (concat "^" indent "\\b") end t)
                  (backward-char))))))))
 
+(defun lpy-bounds-defun ()
+  (save-excursion
+    (let (beg)
+      (unless (looking-at "^")
+        (beginning-of-defun))
+      (setq beg (point))
+      (end-of-defun)
+      (cons beg (point)))))
+
 (defun lpy-avy-symbol ()
   (interactive)
   (lispy--avy-do
    avy-goto-word-0-regexp
-   (lispy--bounds-outline)
+   (lpy-bounds-defun)
    (lambda ()
      (not (save-excursion
             (forward-char -1)
             (lispy--in-string-or-comment-p))))
-   'at-full))
+   'at-full)
+  (deactivate-mark)
+  (cond ((looking-at "^"))
+        ((looking-back "^ +" (line-beginning-position))
+         (backward-char))
+        (t
+         (lispy-mark-symbol))))
 
 (defun lpy-up (arg)
   "Move up ARG times inside the current sexp."
