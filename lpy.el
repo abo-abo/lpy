@@ -435,22 +435,30 @@
       (end-of-defun)
       (cons beg (point)))))
 
-(defun lpy-avy-symbol ()
-  (interactive)
-  (lispy--avy-do
-   avy-goto-word-0-regexp
-   (lpy-bounds-defun)
-   (lambda ()
-     (not (save-excursion
-            (forward-char -1)
-            (lispy--in-string-or-comment-p))))
-   'at-full)
-  (deactivate-mark)
+(defun lpy-avy-symbol-action (x)
+  (goto-char x)
   (cond ((looking-at "^"))
         ((looking-back "^ +" (line-beginning-position))
          (backward-char))
         (t
-         (lispy-mark-symbol))))
+         (lpy-mark-symbol))))
+
+(defun lpy-avy-symbol ()
+  (interactive)
+  (deactivate-mark)
+  (let ((bnd (lpy-bounds-defun))
+        (avy-action 'lpy-avy-symbol-action)
+        (avy-handler-function (lambda (_) (throw 'done 'exit))))
+    (lispy--avy-do
+     "\\_<\\sw"
+     (or
+      (lispy-bounds-python-block)
+      (lpy-bounds-defun))
+     (lambda ()
+       (not (save-excursion
+              (forward-char -1)
+              (lispy--in-string-or-comment-p))))
+     'at-full)))
 
 (defun lpy-up (arg)
   "Move up ARG times inside the current sexp."
