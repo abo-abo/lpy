@@ -87,7 +87,7 @@
         (setq-local outline-regexp "#\\*+")
         (setq-local outline-heading-end-regexp "\n")
         (setq-local outline-level 'lispy-outline-level)
-        (setq-local forward-sexp-function 'lpy-forward-sexp-function)
+        ;; (setq-local forward-sexp-function 'lpy-forward-sexp-function)
         (font-lock-add-keywords major-mode lpy-font-lock-keywords))
     (font-lock-remove-keywords major-mode lpy-font-lock-keywords)
     (setq-local forward-sexp-function nil)))
