@@ -753,6 +753,44 @@
       (put 'lispy-recenter :line window-line)
       (recenter 0))))
 
+(require 'function-args)
+
+(defun lpy-goto (arg)
+  "Select a tag to jump to from tags defined in current buffer.
+When ARG is 2, jump to tags in current dir."
+  (interactive "p")
+  (require 'semantic-directory)
+  (let* ((file-list
+          (if (> arg 1)
+              (cl-remove-if
+               (lambda (x)
+                 (string-match "^\\.#" x))
+               (append (file-expand-wildcards "*.py")))
+            (list (buffer-file-name))))
+         (sd-force-reparse (> arg 2))
+         (ready-tags
+          (or
+           (let ((tags (sd-fetch-tags file-list)))
+             (when (memq major-mode '(python-mode))
+               (setq tags
+                     (delq nil
+                           (mapcar
+                            (lambda (x)
+                              (let ((s (py-tag-name x)))
+                                (when s
+                                  (cons
+                                   (moo-format-tag-line
+                                    s (semantic-tag-get-attribute x :truefile))
+                                   x))))
+                            tags))))
+             (puthash file-list tags moo-jump-local-cache)
+             tags)))
+         (preselect (car (semantic-current-tag))))
+    (moo-select-candidate
+     ready-tags
+     #'moo-action-jump
+     preselect)))
+
 (let ((map lpy-mode-map))
   (define-key map (kbd "]") 'lispy-forward)
   (define-key map (kbd "[") 'lpy-backward)
@@ -771,7 +809,7 @@
   (lpy-define-key map "d" 'lpy-different)
   (lpy-define-key map "e" 'lispy-eval)
   (lpy-define-key map "f" 'lpy-flow)
-  (lpy-define-key map "g" 'self-insert-command)
+  (lpy-define-key map "g" 'lpy-goto)
   (lpy-define-key map "h" 'lpy-left)
   (lpy-define-key map "i" 'lpy-tab)
   (lpy-define-key map "j" 'lpy-down)
