@@ -596,12 +596,7 @@
 
 (defun lpy-mark-symbol ()
   (interactive)
-  (if (or (lispy-bolp) (region-active-p))
-      (progn
-        (back-to-indentation)
-        (set-mark (point))
-        (end-of-line))
-    (lispy-mark-symbol)))
+  (lispy--mark (bounds-of-thing-at-point 'symbol)))
 
 (defun lpy-parens (&optional arg)
   "Insert a pair of parens."
