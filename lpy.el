@@ -659,9 +659,6 @@
                  ((lpy-arg-rightp)
                   (set-mark (point))
                   (backward-sexp))))
-          ((bolp)
-           (set-mark (point))
-           (end-of-line))
           (t
            (lispy-mark)))))
 
