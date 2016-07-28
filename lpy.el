@@ -127,6 +127,7 @@
 (defun lpy-line-left-p ()
   (or (and (bolp)
            (not (or
+                 (eolp)
                  (looking-at " ")
                  (memq last-command '(lpy-space newline))
                  (looking-at "[ \n]*\\'"))))
