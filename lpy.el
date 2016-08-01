@@ -802,6 +802,34 @@ When ARG is 2, jump to tags in current dir."
      #'moo-action-jump
      preselect)))
 
+(defun lpy-beautify-strings ()
+  "Replace 'foo' with \"foo\"."
+  (interactive)
+  (goto-char (point-min))
+  (let (bnd)
+    (while (re-search-forward "'." nil t)
+      (when (setq bnd (lispy--bounds-string))
+        (goto-char (car bnd))
+        (delete-char 1)
+        (insert "\"")
+        (goto-char (cdr bnd))
+        (delete-char -1)
+        (insert "\"")))))
+
+(defun lpy-beautify-commas ()
+  "Place spaces after commas."
+  (interactive)
+  (goto-char (point-min))
+  (while (re-search-forward "\\(,\\)[^ ]" nil t)
+    (replace-match ", " t t nil 1)))
+
+(defun lpy-beautify-parens ()
+  "Place spaces before parens."
+  (interactive)
+  (goto-char (point-min))
+  (while (re-search-forward "[^ ]\\((\\)")
+    (replace-match " (" t t nil 1)))
+
 (let ((map lpy-mode-map))
   (define-key map (kbd "]") 'lispy-forward)
   (define-key map (kbd "[") 'lpy-backward)
