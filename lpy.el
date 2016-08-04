@@ -194,6 +194,18 @@
          (let ((forward-sexp-function nil))
            (indent-sexp)))))
 
+(defun lpy-contents ()
+  (interactive)
+  (let ((bnd (worf--end-positions)))
+    (if (get-char-property (1- (cdr bnd)) 'invisible)
+        (outline-flag-region (car bnd) (cdr bnd) nil)
+      (outline-flag-region (car bnd) (cdr bnd) t)
+      (lispy-flet (org-unlogged-message (&rest _x))
+        (require 'org)
+        (let ((org-outline-regexp outline-regexp)
+              (orgstruct-mode t))
+          (org-cycle-internal-local))))))
+
 (defun lpy--insert-or-call (def)
   `(lambda ()
      ,(format "Call `%s' when special, self-insert otherwise.\n\n%s"
@@ -857,6 +869,7 @@ When ARG is 2, jump to tags in current dir."
   (lpy-define-key map "g" 'lpy-goto)
   (lpy-define-key map "h" 'lpy-left)
   (lpy-define-key map "i" 'lpy-tab)
+  (lpy-define-key map "/" 'lpy-contents)
   (lpy-define-key map "j" 'lpy-down)
   (lpy-define-key map "k" 'lpy-up)
   (lpy-define-key map "l" 'lpy-right)
