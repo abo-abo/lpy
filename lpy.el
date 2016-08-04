@@ -195,16 +195,25 @@
            (indent-sexp)))))
 
 (defun lpy-contents ()
+  "Toggle contents for the current outline."
   (interactive)
+  (require 'org)
   (let ((bnd (worf--end-positions)))
-    (if (get-char-property (1- (cdr bnd)) 'invisible)
-        (outline-flag-region (car bnd) (cdr bnd) nil)
-      (outline-flag-region (car bnd) (cdr bnd) t)
-      (lispy-flet (org-unlogged-message (&rest _x))
-        (require 'org)
-        (let ((org-outline-regexp outline-regexp)
-              (orgstruct-mode t))
-          (org-cycle-internal-local))))))
+    (cond
+      ;; fully hidden
+      ((get-char-property (car bnd) 'invisible)
+       (outline-flag-region (car bnd) (cdr bnd) nil)
+       (lpy-contents))
+      ;; contents
+      ((get-char-property (1- (cdr bnd)) 'invisible)
+       (outline-flag-region (car bnd) (cdr bnd) nil))
+      ;; fully revealed
+      (t
+       (outline-flag-region (car bnd) (cdr bnd) t)
+       (cl-letf (((symbol-function 'org-unlogged-message) 'ignore))
+         (let ((org-outline-regexp outline-regexp)
+               (orgstruct-mode t))
+           (org-cycle-internal-local)))))))
 
 (defun lpy--insert-or-call (def)
   `(lambda ()
@@ -536,7 +545,7 @@
                     nil)))))
         ((lpy-line-left-p)
          (if (bolp)
-             (re-search-backward "^[^ \n]" (1+ (lispy--outline-beg)) t)
+             (re-search-backward "^[^ \n]" (lispy--outline-beg) t)
            (if (bolp)
                (lpy-next-top-level-sexp)
              (let (beg)
