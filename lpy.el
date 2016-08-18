@@ -881,6 +881,14 @@ When ARG is 2, jump to tags in current dir."
          (insert "\"\"")
          (backward-char))))
 
+(defun lpy-split ()
+  (interactive)
+  (if (lispy--in-string-p)
+      (progn
+        (insert "\"\n\"")
+        (indent-for-tab-command))
+    (indent-new-comment-line)))
+
 (let ((map lpy-mode-map))
   (define-key map (kbd "]") 'lispy-forward)
   (define-key map (kbd "[") 'lpy-backward)
@@ -892,6 +900,7 @@ When ARG is 2, jump to tags in current dir."
   (define-key map (kbd "C-1") 'lispy-describe-inline)
   (define-key map (kbd "M-.") 'lispy-goto-symbol)
   (define-key map (kbd "M-,") 'pop-tag-mark)
+  (define-key map (kbd "M-j") 'lpy-split)
   (define-key map (kbd "SPC") 'lpy-space)
   (define-key map "(" 'lpy-parens)
   (define-key map "φ" 'lpy-parens)
