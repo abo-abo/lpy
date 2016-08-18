@@ -933,6 +933,8 @@ When ARG is 2, jump to tags in current dir."
   (lpy-define-key map "y" 'self-insert-command)
   (lpy-define-key map "z" 'self-insert-command)
   (lpy-define-key map "I" 'lispy-shifttab)
+  (lpy-define-key map "F" 'lispy-goto-symbol)
+  (lpy-define-key map "D" 'pop-tag-mark)
   (lpy-define-key map "J" 'lispy-outline-next)
   (lpy-define-key map "K" 'lispy-outline-prev)
   (lpy-define-key map "N" 'lispy-narrow)
