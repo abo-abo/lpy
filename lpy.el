@@ -889,7 +889,7 @@ When ARG is 2, jump to tags in current dir."
   (define-key map (kbd "M-RET") 'lpy-meta-return)
   (define-key map (kbd "M-<left>") 'lispy-outline-demote)
   (define-key map (kbd "M-<right>") 'lispy-outline-promote)
-  (define-key map (kbd "C-1") 'jedi:show-doc)
+  (define-key map (kbd "C-1") 'lispy-describe-inline)
   (define-key map (kbd "M-.") 'lispy-goto-symbol)
   (define-key map (kbd "M-,") 'pop-tag-mark)
   (define-key map (kbd "SPC") 'lpy-space)
