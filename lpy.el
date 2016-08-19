@@ -458,7 +458,10 @@
              (let ((indent (buffer-substring-no-properties
                             (line-beginning-position)
                             (1+ (point)))))
-               (when (re-search-forward (concat "^" indent "\\b") end t)
+               (while (and (re-search-forward (concat "^" indent "\\b") end t)
+                           (lispy--in-string-p))
+                 (python-nav-end-of-statement))
+               (unless (eq (char-after) 32)
                  (backward-char))))))))
 
 (defun lpy-bounds-defun ()
@@ -563,9 +566,11 @@
                (let ((indent (buffer-substring-no-properties
                               (line-beginning-position)
                               (1+ (point)))))
-                 (when (re-search-backward (concat "^" indent "\\b") beg t)
-                   (back-to-indentation)
-                   (backward-char)))))))))
+                 (while (and (re-search-backward (concat "^" indent "\\b") beg t)
+                             (lispy--in-string-p))
+                   (python-nav-beginning-of-statement))
+                 (back-to-indentation)
+                 (backward-char))))))))
 
 (defun lpy-flow ()
   (interactive)
