@@ -354,8 +354,15 @@
 
 (defun lpy-next-top-level-sexp ()
   (forward-char 1)
-  (re-search-forward "^[^ \n]" (lispy--outline-end) t)
+  (while (and (re-search-forward "^[^ \n]" (lispy--outline-end) t)
+              (lispy--in-string-p))
+    (python-nav-end-of-statement))
   (forward-char -1))
+
+(defun lpy-prev-top-level-sexp ()
+  (when (re-search-backward "^[^ \n]" (1+ (lispy--outline-beg)) t)
+    (while (lispy--in-string-or-comment-p)
+      (python-nav-beginning-of-statement))))
 
 (defhydra hydra-lispy-move (:pre
                             (progn
@@ -545,7 +552,7 @@
                     nil)))))
         ((lpy-line-left-p)
          (if (bolp)
-             (re-search-backward "^[^ \n]" (lispy--outline-beg) t)
+             (lpy-prev-top-level-sexp)
            (if (bolp)
                (lpy-next-top-level-sexp)
              (let (beg)
