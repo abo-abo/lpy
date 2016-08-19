@@ -834,7 +834,7 @@ When ARG is 2, jump to tags in current dir."
                      (delq nil
                            (mapcar
                             (lambda (x)
-                              (let ((s (py-tag-name x)))
+                              (let ((s (lpy-tag-name x)))
                                 (when s
                                   (cons
                                    (moo-format-tag-line
@@ -848,6 +848,49 @@ When ARG is 2, jump to tags in current dir."
      ready-tags
      #'moo-action-jump
      preselect)))
+
+(defun lpy-tag-name (tag)
+  (let* ((class (semantic-tag-class tag))
+         (str (cl-case class
+                (function
+                 (let ((args (semantic-tag-get-attribute tag :arguments)))
+                   (format "%s %s (%s)"
+                           (propertize "def" 'face 'font-lock-builtin-face)
+                           (propertize (car tag) 'face 'font-lock-function-name-face)
+                           (mapconcat #'car args ", "))))
+                (variable
+                 (car tag))
+                (type
+                 (propertize (car tag) 'face 'fa-face-type-definition))
+                (include
+                 (format "%s %s"
+                         (propertize "import" 'face 'font-lock-preprocessor-face)
+                         (car tag)))
+                (code
+                 (let* ((beg)
+                        (end)
+                        (ov (semantic-tag-overlay tag))
+                        (buf (cond
+                               ((and (overlayp ov)
+                                     (bufferp (overlay-buffer ov)))
+                                (setq beg (overlay-start ov))
+                                (setq end (overlay-end ov))
+                                (overlay-buffer ov))
+                               ((arrayp ov)
+                                (setq beg (aref ov 0))
+                                (setq end (aref ov 1))
+                                (current-buffer))))
+                        str)
+                   (when (and buf
+                              (setq str
+                                    (ignore-errors
+                                      (with-current-buffer buf
+                                        (buffer-substring-no-properties beg end))))
+                              (string-match (format "^%s ?=" (car tag)) str))
+                     (concat (car tag) "="))))
+                (t
+                 (error "Unknown class for tag: %S" tag)))))
+    str))
 
 (defun lpy-beautify-strings ()
   "Replace 'foo' with \"foo\"."
