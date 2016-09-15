@@ -360,9 +360,12 @@
   (forward-char -1))
 
 (defun lpy-prev-top-level-sexp ()
-  (when (re-search-backward "^[^ \n]" (1+ (lispy--outline-beg)) t)
-    (while (lispy--in-string-or-comment-p)
-      (python-nav-beginning-of-statement))))
+  (let ((beg (lispy--outline-beg)))
+    (unless (eq beg 1)
+      (cl-incf beg))
+    (when (re-search-backward "^[^ \n]" beg t)
+      (while (lispy--in-string-or-comment-p)
+        (python-nav-beginning-of-statement)))))
 
 (defhydra hydra-lispy-move (:pre
                             (progn
