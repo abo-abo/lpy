@@ -226,10 +226,7 @@
            ((lispy--in-string-or-comment-p)
             (call-interactively 'self-insert-command))
 
-           ((or (lpy-left-p)
-                (lpy-right-p)
-                (lpy-line-left-p)
-                (lpy-line-right-p)
+           ((or (lpy-line-left-p)
                 (and (lispy-bolp)
                      (not (memq last-command '(self-insert-command
                                                soap-command
