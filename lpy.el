@@ -370,10 +370,10 @@
                             (progn
                               (setq hydra-is-helpful t)
                               (set-cursor-color "#ffffff")))
-  ("h" lispy-move-left "left")
+  ("h" lispy-outline-demote "left")
   ("j" lispy-move-down "down")
   ("k" lispy-move-up "up")
-  ("l" lispy-move-right "right")
+  ("l" lispy-outline-promote "right")
   ("v" lpy-outline-edit-below "edit outline" :exit t)
   ("n" lpy-outline-add "new" :exit t)
   ("q" nil "quit")
