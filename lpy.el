@@ -74,6 +74,21 @@
     ;; ("^#  \\([^ ].*\\)$" 1 'default prepend)
     ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
 
+(defun lpy-fill-paragraph (&optional _justify)
+  (interactive)
+  (let (bnd)
+    (if (setq bnd (lispy--bounds-comment))
+        (save-restriction
+          (save-excursion
+            (goto-char (car bnd))
+            (while (looking-at outline-regexp)
+              (beginning-of-line 2)
+              (setcar bnd (point)))
+            (narrow-to-region (car bnd) (cdr bnd))
+            (let ((fill-paragraph-function nil))
+              (fill-paragraph))))
+      (let ((fill-paragraph-function nil))
+        (fill-paragraph)))))
 
 (defun lpy-outline-comment-highlight (limit)
   (catch 'done
@@ -1007,6 +1022,7 @@ When ARG is 2, jump to tags in current dir."
         (setq-local outline-regexp "#\\*+")
         (setq-local outline-heading-end-regexp "\n")
         (setq-local outline-level 'lispy-outline-level)
+        (setq-local fill-paragraph-function 'lpy-fill-paragraph)
         ;; (setq-local forward-sexp-function 'lpy-forward-sexp-function)
         (font-lock-add-keywords major-mode lpy-font-lock-keywords))
     (font-lock-remove-keywords major-mode lpy-font-lock-keywords)
