@@ -611,7 +611,7 @@
          (let* ((cur-offset (if (bolp) 0 (1+ (current-column))))
                 (new-offset (+ cur-offset 4))
                 (regex (concat "^" (make-string new-offset ?\ ))))
-           (when (re-search-forward regex nil t)
+           (when (re-search-forward regex (cdr (worf--bounds-subtree)) t)
              (backward-char))))
         ((eolp)
          (let ((lvl (lpy-lvl)))))
