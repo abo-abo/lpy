@@ -956,6 +956,7 @@ When ARG is 2, jump to tags in current dir."
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
     (define-key map (kbd "M-m") 'lpy-mark-symbol)
     (define-key map (kbd "M-RET") 'lpy-meta-return)
+    (define-key map (kbd "<backtab>") 'lispy-shifttab)
     (define-key map (kbd "M-<left>") 'lispy-outline-demote)
     (define-key map (kbd "M-<right>") 'lispy-outline-promote)
     (define-key map (kbd "C-1") 'lispy-describe-inline)
