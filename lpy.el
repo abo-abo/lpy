@@ -348,19 +348,20 @@
       (line-beginning-position))))
 
 (defun lpy-next-top-level-sexp ()
-  (forward-char 1)
-  (while (and (re-search-forward "^[^ \n]" (lispy--outline-end) t)
-              (lispy--in-string-p))
-    (python-nav-end-of-statement))
-  (forward-char -1))
+  (let ((end (lispy--outline-end)))
+    (forward-char 1)
+    (while (and (re-search-forward "^[^ \n]" end t)
+                (lispy--in-string-or-comment-p))
+      (python-nav-end-of-statement))
+    (forward-char -1)))
 
 (defun lpy-prev-top-level-sexp ()
   (let ((beg (lispy--outline-beg)))
     (unless (eq beg 1)
       (cl-incf beg))
-    (when (re-search-backward "^[^ \n]" beg t)
-      (while (lispy--in-string-or-comment-p)
-        (python-nav-beginning-of-statement)))))
+    (while (and (re-search-backward "^[^ \n]" beg t)
+                (or (lispy--in-string-or-comment-p)
+                    (looking-at "#"))))))
 
 (defhydra hydra-lispy-move (:pre
                             (progn
