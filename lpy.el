@@ -611,9 +611,17 @@
         ((lpy-line-left-p)
          (let* ((cur-offset (if (bolp) 0 (1+ (current-column))))
                 (new-offset (+ cur-offset 4))
-                (regex (concat "^" (make-string new-offset ?\ ))))
-           (when (re-search-forward regex (cdr (worf--bounds-subtree)) t)
-             (backward-char))))
+                (regex (concat "^" (make-string new-offset ?\ )))
+                (pt (point))
+                success)
+           (while (and (re-search-forward regex (cdr (worf--bounds-subtree)) t)
+                       (if (lispy--in-comment-p)
+                           t
+                         (setq success t)
+                         nil)))
+           (if success
+               (backward-char)
+             (goto-char pt))))
         ((eolp)
          (let ((lvl (lpy-lvl)))))
         (t
