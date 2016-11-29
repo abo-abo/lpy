@@ -940,9 +940,19 @@ When ARG is 2, jump to tags in current dir."
         (indent-for-tab-command))
     (indent-new-comment-line)))
 
+(defun lpy-beginning-of-line ()
+  (interactive)
+  (if (and (looking-at " ")
+           (looking-back " +" (line-beginning-position)))
+      (beginning-of-line)
+    (back-to-indentation)
+    (unless (bolp)
+      (backward-char))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
+    (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "M-m") 'lpy-mark-symbol)
     (define-key map (kbd "M-RET") 'lpy-meta-return)
     (define-key map (kbd "<backtab>") 'lispy-shifttab)
