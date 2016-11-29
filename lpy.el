@@ -972,6 +972,7 @@ When ARG is 2, jump to tags in current dir."
     (lpy-define-key map "c" 'hydra-lispy-move/body)
     (lpy-define-key map "d" 'lpy-different)
     (lpy-define-key map "e" 'lispy-eval)
+    (lpy-define-key map "E" 'lispy-eval-and-insert)
     (lpy-define-key map "f" 'lpy-flow)
     (lpy-define-key map "g" 'lpy-goto)
     (lpy-define-key map "h" 'lpy-left)
