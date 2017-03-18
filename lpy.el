@@ -130,7 +130,8 @@
                  (memq last-command '(lpy-space newline))
                  (looking-at "[ \n]*\\'"))))
       (and (looking-at " ")
-           (looking-back "^ +" (line-beginning-position)))))
+           (looking-back "^ +" (line-beginning-position))
+           (not (= (mod (current-column) 4) 0)))))
 
 (defun lpy-line-right-p ()
   (or ;; (eolp)
