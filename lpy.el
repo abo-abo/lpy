@@ -473,20 +473,34 @@
 
 (defun lpy-avy-symbol ()
   (interactive)
-  (deactivate-mark)
-  (let ((bnd (lpy-bounds-defun))
-        (avy-action 'lpy-avy-symbol-action)
-        (avy-handler-function (lambda (_) (throw 'done 'exit))))
-    (lispy--avy-do
-     "\\_<\\sw"
-     (or
-      (lispy-bounds-python-block)
-      (lpy-bounds-defun))
-     (lambda ()
-       (not (save-excursion
-              (forward-char -1)
-              (lispy--in-string-or-comment-p))))
-     'at-full)))
+  (if (looking-at lispy-outline)
+      (lpy-add-outline)
+    (deactivate-mark)
+    (let ((bnd (lpy-bounds-defun))
+          (avy-action 'lpy-avy-symbol-action)
+          (avy-handler-function (lambda (_) (throw 'done 'exit))))
+      (lispy--avy-do
+       "\\_<\\sw"
+       (or
+        (lispy-bounds-python-block)
+        (lpy-bounds-defun))
+       (lambda ()
+         (not (save-excursion
+                (forward-char -1)
+                (lispy--in-string-or-comment-p))))
+       'at-full))))
+
+(defun lpy-add-outline ()
+  (when (save-excursion
+          (forward-char 1)
+          (not (re-search-forward "^#\\*+ ?" nil t)))
+    (goto-char (point-max))
+    (skip-chars-backward "\n ")
+    (delete-region (point) (point-max))
+    (let ((lvl (save-excursion
+                 (lpy-back-to-outline)
+                 (lispy-outline-level))))
+      (insert "\n\n#" (make-string lvl ?\*) " :\n"))))
 
 (defun lpy-up (arg)
   "Move up ARG times inside the current sexp."
