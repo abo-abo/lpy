@@ -981,11 +981,25 @@ When ARG is 2, jump to tags in current dir."
       (t
        (kill-line)))))
 
+(defun lpy-delete ()
+  (interactive)
+  (if (looking-at " *$")
+      (let ((offset (mod (current-column) 4)))
+        (delete-region (point) (1+ (match-end 0)))
+        (when (looking-at " +")
+          (delete-region (match-beginning 0)
+                         (match-end 0)))
+        (indent-for-tab-command)
+        (when (= offset 3)
+          (backward-char 1)))
+    (delete-char 1)))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "C-k") 'lpy-kill-line)
+    (define-key map (kbd "C-d") 'lpy-delete)
     (define-key map (kbd "M-m") 'lpy-mark-symbol)
     (define-key map (kbd "M-RET") 'lpy-meta-return)
     (define-key map (kbd "<backtab>") 'lispy-shifttab)
