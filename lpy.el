@@ -964,10 +964,28 @@ When ARG is 2, jump to tags in current dir."
     (unless (bolp)
       (backward-char))))
 
+(defun lpy-kill-line ()
+  (interactive)
+  (let (bnd)
+    (cond
+      ((bolp)
+       (kill-line))
+      ((and (setq bnd (lispy--bounds-string))
+            (not (eq (point) (car bnd))))
+       (kill-region (point) (1- (cdr bnd))))
+      ((eolp)
+       (delete-region (line-beginning-position)
+                      (progn (skip-chars-forward " \n")
+                             (point)))
+       (indent-for-tab-command))
+      (t
+       (kill-line)))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
+    (define-key map (kbd "C-k") 'lpy-kill-line)
     (define-key map (kbd "M-m") 'lpy-mark-symbol)
     (define-key map (kbd "M-RET") 'lpy-meta-return)
     (define-key map (kbd "<backtab>") 'lispy-shifttab)
