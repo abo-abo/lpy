@@ -131,15 +131,7 @@
 
 (defun lpy-space (arg)
   (interactive "p")
-  (cond
-    ((lispy--in-string-or-comment-p)
-     (self-insert-command arg))
-    ((looking-back "^ *" (line-beginning-position))
-     (skip-chars-forward " ")
-     (when (eq (char-before) ?\ )
-       (backward-char)))
-    (t
-     (self-insert-command arg))))
+  (self-insert-command arg))
 
 (defun lpy-line-left-p ()
   (or (and (bolp)
