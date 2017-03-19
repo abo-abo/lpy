@@ -997,9 +997,8 @@ When ARG is 2, jump to tags in current dir."
        (kill-region (point) (1- (cdr bnd))))
       ((eolp)
        (delete-region (line-beginning-position)
-                      (progn (skip-chars-forward " \n")
-                             (point)))
-       (indent-for-tab-command))
+                      (1+ (point)))
+       (back-to-indentation))
       (t
        (kill-line)))))
 
