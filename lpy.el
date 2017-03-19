@@ -166,7 +166,8 @@
 
 (defun lpy-tab ()
   (interactive)
-  (cond ((lispy--in-comment-p)
+  (cond ((or (lispy--in-comment-p)
+             (looking-at lispy-outline))
          (let* ((bnd (worf--end-positions))
                 (eoh (car bnd))
                 (eos (cdr bnd)))
