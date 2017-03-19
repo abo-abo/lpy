@@ -851,7 +851,8 @@ When ARG is 2, jump to tags in current dir."
          (sd-force-reparse (> arg 2))
          (ready-tags
           (or
-           (let ((tags (sd-fetch-tags file-list)))
+           (let ((tags (moo-flatten-namepaces
+                        (sd-fetch-tags file-list))))
              (when (memq major-mode '(python-mode))
                (setq tags
                      (delq nil
