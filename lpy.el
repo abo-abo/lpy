@@ -1046,6 +1046,24 @@ When ARG is 2, jump to tags in current dir."
             (setq idx -1)))))
     (save-buffer)))
 
+(defun lpy-outline-level ()
+  "Compute the outline level of the heading at point."
+  (save-excursion
+    (save-match-data
+      (cond ((looking-at "^\\(class\\|def\\)")
+             (if (re-search-backward "^#\\*+" nil t)
+                 (1+ (lpy-outline-level))
+               0))
+            ((looking-at " +def")
+             (if (re-search-backward "\\(?:^#\\*+\\)\\|^class" nil t)
+                 (1+ (lpy-outline-level))
+               0))
+            (t
+             (end-of-line)
+             (if (re-search-backward outline-regexp nil t)
+                 (max (cl-count ?* (match-string 0)) 1)
+               0))))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
@@ -1115,11 +1133,11 @@ When ARG is 2, jump to tags in current dir."
   :lighter " LPY"
   (if lpy-mode
       (progn
-        (setq-local lispy-outline "^#\\*+")
         (setq lispy-outline-header "#")
-        (setq-local outline-regexp "#\\*+")
+        (setq-local outline-regexp "\\(?:#\\*+\\)\\|\\(?:^\\(?: *def\\)\\|^class \\)")
+        (setq-local lispy-outline (concat "^" outline-regexp))
         (setq-local outline-heading-end-regexp "\n")
-        (setq-local outline-level 'lispy-outline-level)
+        (setq-local outline-level 'lpy-outline-level)
         (setq-local fill-paragraph-function 'lpy-fill-paragraph)
         (setq-local fill-forward-paragraph-function 'lpy-fill-forward-paragraph-function)
         ;; (setq-local forward-sexp-function 'lpy-forward-sexp-function)
