@@ -129,6 +129,10 @@
   (looking-back lispy-right
                 (line-beginning-position)))
 
+(defun lpy-outline-p ()
+  (and (looking-at outline-regexp)
+       (looking-at lispy-outline-header)))
+
 (defun lpy-space (arg)
   (interactive "p")
   (self-insert-command arg))
@@ -455,23 +459,28 @@
          (unless (= 0 (skip-chars-forward " "))
            (backward-char)))
         ((lpy-line-left-p)
-         (if (bolp)
-             (lpy-next-top-level-sexp)
-           (let (beg end)
-             (save-excursion
-               (forward-char)
-               (python-nav-backward-up-list)
-               (setq beg (point))
-               (python-nav-forward-sexp)
-               (setq end (point)))
-             (let ((indent (buffer-substring-no-properties
-                            (line-beginning-position)
-                            (1+ (point)))))
-               (while (and (re-search-forward (concat "^" indent "\\b") end t)
-                           (lispy--in-string-p))
-                 (python-nav-end-of-statement))
-               (unless (eq (char-after) 32)
-                 (backward-char))))))))
+         (when (looking-at " ")
+           (forward-char 1))
+         (let* ((offset (current-column))
+                (bound (if (= offset 0)
+                           (point-max)
+                         (save-excursion
+                           (re-search-forward
+                            (format "^%s[^ \n]" (make-string (- offset 4) 32))))))
+                (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                                            (line-beginning-position) (point))))
+                (old-point (point))
+                bnd)
+           (forward-char 1)
+           (unless (catch 'done
+                     (while (re-search-forward regex bound t)
+                       (goto-char (1- (match-end 0)))
+                       (if (setq bnd (lispy--bounds-string))
+                           (goto-char (cdr bnd))
+                         (throw 'done t))))
+             (goto-char old-point))
+           (unless (bolp)
+             (backward-char 1))))))
 
 (defun lpy-bounds-defun ()
   (save-excursion
@@ -549,8 +558,7 @@
                (lispy--mark (cons beg end)))
              (when leftp
                (exchange-point-and-mark)))))
-        ((and (looking-at outline-regexp)
-              (looking-at lispy-outline-header))
+        ((lpy-outline-p)
          (zo-up arg)
          (unless (= 0 (skip-chars-forward " "))
            (backward-char)))
@@ -570,23 +578,26 @@
 
            (lispy-down arg)))
         ((lpy-line-left-p)
-         (if (bolp)
-             (lpy-prev-top-level-sexp)
-           (if (bolp)
-               (lpy-next-top-level-sexp)
-             (let (beg)
-               (save-excursion
-                 (forward-char)
-                 (python-nav-backward-up-list)
-                 (setq beg (point)))
-               (let ((indent (buffer-substring-no-properties
-                              (line-beginning-position)
-                              (1+ (point)))))
-                 (while (and (re-search-backward (concat "^" indent "\\b") beg t)
-                             (lispy--in-string-p))
-                   (python-nav-beginning-of-statement))
-                 (back-to-indentation)
-                 (backward-char))))))))
+         (when (looking-at " ")
+           (forward-char 1))
+         (let* ((offset (current-column))
+                (bound (if (= offset 0)
+                           (point-min)
+                         (save-excursion
+                           (re-search-backward
+                            (format "^%s[^ \n]" (make-string (- offset 4) 32))))))
+                (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                                            (line-beginning-position) (point))))
+                bnd)
+           (catch 'done
+             (while (re-search-backward regex bound t)
+               (goto-char (- (match-end 0) 1))
+               ;; triple quoted strings
+               (if (setq bnd (lispy--bounds-string))
+                   (goto-char (car bnd))
+                 (throw 'done t))))
+           (unless (bolp)
+             (backward-char 1))))))
 
 (defun lpy-flow ()
   (interactive)
@@ -604,13 +615,17 @@
 
 (defun lpy-left (arg)
   (interactive "p")
-  (cond ((looking-at lispy-outline)
+  (cond ((lpy-outline-p)
          (zo-left arg))
         ((lpy-line-left-p)
-         (lpy-backward))
-        ((or (looking-at lispy-left)
-             (looking-back lispy-right (line-beginning-position)))
-         (lpy-backward))
+         (when (looking-at " ")
+           (forward-char 1))
+         (let* ((offset (current-column))
+                (regex (format "^%s[^ \n]" (make-string (- offset 4) 32))))
+           (when (re-search-backward regex nil t)
+             (goto-char (1- (match-end 0))))
+           (unless (bolp)
+             (backward-char 1))))
         (t
          (self-insert-command 1))))
 
@@ -621,14 +636,14 @@
 
 (defun lpy-right (arg)
   (interactive "p")
-  (cond ((looking-at lispy-outline)
+  (cond ((lpy-outline-p)
          (unless (zo-right 1)
            (when (re-search-forward "^\\sw" (cdr (worf--bounds-subtree)) t)
              (backward-char))))
         ((lpy-line-left-p)
          (let* ((cur-offset (if (bolp) 0 (1+ (current-column))))
                 (new-offset (+ cur-offset 4))
-                (regex (concat "^" (make-string new-offset ?\ )))
+                (regex (format "^%s[^ \n]" (make-string new-offset 32)))
                 (pt (point))
                 success)
            (while (and (re-search-forward regex (cdr (worf--bounds-subtree)) t)
@@ -638,7 +653,9 @@
                          nil)))
            (if success
                (backward-char)
-             (goto-char pt))))
+             (goto-char pt))
+           (unless (or (bolp) (looking-at " "))
+             (backward-char 1))))
         ((eolp)
          (let ((lvl (lpy-lvl)))))
         (t
