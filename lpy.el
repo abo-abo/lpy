@@ -634,6 +634,7 @@
 
 (defun lpy-right (arg)
   (interactive "p")
+  (lispy--remember)
   (cond ((lpy-outline-p)
          (unless (zo-right 1)
            (when (re-search-forward "^\\sw" (cdr (worf--bounds-subtree)) t)
