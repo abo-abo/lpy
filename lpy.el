@@ -451,13 +451,8 @@
                     nil))
 
            (lispy-down arg)))
-        ((and (looking-at outline-regexp)
-              (progn
-                (when (looking-at " +")
-                  (goto-char (1- (match-end 0))))
-                (zo-down arg)))
-         (unless (= 0 (skip-chars-forward " "))
-           (backward-char)))
+        ((looking-at outline-regexp)
+         (zo-down arg))
         ((lpy-line-left-p)
          (when (looking-at " ")
            (forward-char 1))
