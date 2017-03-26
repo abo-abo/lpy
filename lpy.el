@@ -226,7 +226,7 @@
       (t
        (outline-flag-region (car bnd) (cdr bnd) t)
        (cl-letf (((symbol-function 'org-unlogged-message) 'ignore))
-         (let ((org-outline-regexp outline-regexp)
+         (let ((org-outline-regexp "\\(?:#\\*+\\)\\|\\(?:^\\(?: *def\\)\\|^class \\)")
                (orgstruct-mode t))
            (org-cycle-internal-local)))))))
 
@@ -1152,7 +1152,7 @@ When ARG is 2, jump to tags in current dir."
   (if lpy-mode
       (progn
         (setq lispy-outline-header "#")
-        (setq-local outline-regexp "\\(?:#\\*+\\)\\|\\(?:^\\(?: *def\\)\\|^class \\)")
+        (setq-local outline-regexp "#\\*+")
         (setq-local lispy-outline (concat "^" outline-regexp))
         (setq-local outline-heading-end-regexp "\n")
         (setq-local outline-level 'lpy-outline-level)
