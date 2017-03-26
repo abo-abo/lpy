@@ -65,11 +65,11 @@
 (require 'org)
 
 (defconst lpy-font-lock-keywords
-  '(("^#\\(\\* .*\\)$" 1 'org-level-1 prepend)
-    ("^#\\(\\*\\* .*\\)$" 1 'org-level-2 prepend)
-    ("^#\\(\\*\\*\\* .*\\)$" 1 'org-level-3 prepend)
-    ("^#\\(\\*\\*\\*\\* .*\\)$" 1 'org-level-4 prepend)
-    ("^#\\(\\*\\*\\*\\*\\* .*\\)$" 1 'org-level-5 prepend)
+  '(("^#\\(\\*[^*\n]?.*\\)$" 1 'org-level-1 prepend)
+    ("^#\\(\\*\\*[^*\n]?.*\\)$" 1 'org-level-2 prepend)
+    ("^#\\(\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-3 prepend)
+    ("^#\\(\\*\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-4 prepend)
+    ("^#\\(\\*\\*\\*\\*\\*[*\n]?.*\\)$" 1 'org-level-5 prepend)
     (lpy-outline-comment-highlight 1 'default prepend)
     ;; ("^#  \\([^ ].*\\)$" 1 'default prepend)
     ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
