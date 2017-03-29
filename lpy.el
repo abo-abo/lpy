@@ -460,8 +460,10 @@
                 (bound (if (= offset 0)
                            (point-max)
                          (save-excursion
-                           (re-search-forward
-                            (format "^%s[^ \n]" (make-string (- offset 4) 32))))))
+                           (or (re-search-forward
+                                (format "^%s[^ \n]" (make-string (- offset 4) 32))
+                                nil t)
+                               (point-max)))))
                 (regex (format "^%s[^ \n]" (buffer-substring-no-properties
                                             (line-beginning-position) (point))))
                 (old-point (point))
