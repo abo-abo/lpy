@@ -54,6 +54,7 @@
 ;; `lpy-mode' off : with "C-b e".
 
 (require 'lispy)
+(require 'worf)
 (require 'jedi nil t)
 (require 'soap)
 (require 'flyspell nil t)
