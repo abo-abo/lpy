@@ -732,6 +732,15 @@
     (lispy-pam-store 'lpy-back-to-outline)
     (outline-back-to-heading)))
 
+(defun lpy-back-to-special ()
+  (interactive)
+  (if (lispy-bolp)
+      (lispy-pam-restore 'lpy-back-to-special)
+    (lispy-pam-store 'lpy-back-to-special)
+    (back-to-indentation)
+    (unless (bolp)
+      (backward-char))))
+
 (defun lpy-mark ()
   (interactive)
   (let (bnd)
@@ -1087,6 +1096,7 @@ When ARG is 2, jump to tags in current dir."
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
+    (define-key map (kbd "M-o") 'lpy-back-to-special)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "C-k") 'lpy-kill-line)
     (define-key map (kbd "C-d") 'lpy-delete)
