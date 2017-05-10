@@ -850,13 +850,10 @@
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (while (re-search-forward "^# =>" nil t)
+    (while (re-search-forward "^ *# =>" nil t)
       (let ((bnd (lispy--bounds-comment)))
         (delete-region (car bnd) (cdr bnd))
-        (when (looking-at "\\(\n+\\)#\\*")
-          (delete-region (match-beginning 1)
-                         (match-end 1))
-          (newline))))))
+        (delete-region (1- (line-beginning-position)) (point))))))
 
 (defun lpy-view ()
   (interactive)
