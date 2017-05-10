@@ -1094,6 +1094,42 @@ When ARG is 2, jump to tags in current dir."
                  (max (cl-count ?* (match-string 0)) 1)
                0))))))
 
+(defun lpy-occur-action (x)
+  (goto-char lispy--occur-beg)
+  (forward-line (read x))
+  (when (re-search-forward (ivy--regex ivy-text) (line-end-position) t)
+    (goto-char (match-beginning 0)))
+  (when (lispy-bolp)
+    (unless (bolp)
+      (backward-char))))
+
+(defun lpy-occur ()
+  (interactive)
+  (swiper--init)
+  (unwind-protect
+       (ivy-read "pattern: "
+                 (lispy--occur-candidates
+                  (save-excursion
+                    (unless (bolp)
+                      (re-search-backward "^[^ \n]" nil t))
+                    (cons (point)
+                          (progn
+                            (end-of-defun)
+                            (point)))))
+                 :preselect (lispy--occur-preselect)
+                 :require-match t
+                 :update-fn (lambda ()
+                              (lispy--occur-update-input
+                               ivy-text
+                               (if (boundp 'ivy--current)
+                                   ivy--current
+                                 (ivy-state-current ivy-last))))
+                 :action #'lpy-occur-action
+                 :caller 'lpy-occur)
+    (swiper--cleanup)
+    (when (null ivy-exit)
+      (goto-char swiper--opoint))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
@@ -1141,7 +1177,7 @@ When ARG is 2, jump to tags in current dir."
     (lpy-define-key map "v" 'lpy-view)
     (lpy-define-key map "w" 'self-insert-command)
     (lpy-define-key map "x" 'lispy-x)
-    (lpy-define-key map "y" 'self-insert-command)
+    (lpy-define-key map "y" 'lpy-occur)
     (lpy-define-key map "z" 'self-insert-command)
     (lpy-define-key map "I" 'lispy-shifttab)
     (lpy-define-key map "F" 'lispy-goto-symbol)
