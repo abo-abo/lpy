@@ -1130,10 +1130,19 @@ When ARG is 2, jump to tags in current dir."
     (when (null ivy-exit)
       (goto-char swiper--opoint))))
 
+(defun lpy-switch-to-shell ()
+  (interactive)
+  (let ((buffer (process-buffer (lispy--python-proc))))
+    (if buffer
+        (pop-to-buffer buffer)
+      (run-python "python")
+      (pop-to-buffer "*Python*"))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
     (define-key map (kbd "M-o") 'lpy-back-to-special)
+    (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "C-k") 'lpy-kill-line)
     (define-key map (kbd "C-d") 'lpy-delete)
