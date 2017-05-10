@@ -687,7 +687,11 @@
 
 (defun lpy-mark-symbol ()
   (interactive)
-  (lispy--mark (bounds-of-thing-at-point 'symbol)))
+  (if (looking-at "(")
+      (progn
+        (mark-sexp)
+        (exchange-point-and-mark))
+    (lispy--mark (bounds-of-thing-at-point 'symbol))))
 
 (defun lpy-parens (&optional arg)
   "Insert a pair of parens."
