@@ -693,6 +693,13 @@
         (exchange-point-and-mark))
     (lispy--mark (bounds-of-thing-at-point 'symbol))))
 
+(defvar lpy-no-space t
+  "When non-nil, don't insert a space before parens.")
+
+(defun lpy-just-one-space ()
+  (unless lpy-no-space
+    (just-one-space)))
+
 (defun lpy-parens (&optional arg)
   "Insert a pair of parens."
   (interactive "P")
@@ -701,7 +708,7 @@
           "("
           ")")
          (backward-char 1)
-         (just-one-space)
+         (lpy-just-one-space)
          (backward-char 1))
         (arg
          (let ((bnd (lispy--bounds-dwim)))
@@ -722,7 +729,7 @@
                  (line-beginning-position)))
                (t
                 (unless (eq major-mode 'julia-mode)
-                  (just-one-space))))
+                  (lpy-just-one-space))))
          (insert "()")
          (backward-char))))
 
