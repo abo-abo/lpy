@@ -459,7 +459,9 @@
            (forward-char 1))
          (let* ((offset (current-column))
                 (bound (if (= offset 0)
-                           (point-max)
+                           (save-excursion
+                             (or (outline-next-heading)
+                                 (point-max)))
                          (save-excursion
                            (or (re-search-forward
                                 (format "^%s[^ \n]" (make-string (- offset 4) 32))
