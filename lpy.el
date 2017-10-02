@@ -910,7 +910,7 @@ When ARG is 2, jump to tags in current dir."
                             tags))))
              (puthash file-list tags moo-jump-local-cache)
              tags)))
-         (preselect (car (semantic-current-tag))))
+         (preselect (python-info-current-defun)))
     (moo-select-candidate
      ready-tags
      #'moo-action-jump
