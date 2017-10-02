@@ -1,0 +1,235 @@
+* lpy
+
+Deceptively minimalistic Python IDE for GNU Emacs.
+
+* Introduction
+Q: How many keys does it take to define/redefine a Python function?
+A: One - ~e~.
+
+** Arrow navigation
+Q: Does this also apply to classes, import statements, for loops and
+plain one liners?
+A: Of course.
+
+Q: How many keys does it take to move to the next Python function?
+A: One - ~j~.
+
+Q: Does this also apply to classes, import statements, for loops and
+plain one liners?
+A: Of course.
+
+Q: So, how do I eval a statement, move to the second statement, and
+eval the second statement?
+A: ~eje~.
+
+Q: How to move back to the first statement?
+A: ~k~.
+
+Q: How do I descent into a compound statement, like =def=?
+A: ~l~.
+
+Q: How do I ascent back?
+A: ~h~.
+
+Q: Back to eval, how do I eval something that's not a compound
+statement?
+A: Mark as much legal code as you like with a region and press ~e~.
+
+Q: Any shortcut for marking a symbol in order to eval it?
+A: ~M-m~.
+
+** Semantic navigation
+Q: How can I select a top-level symbol in the current file?
+A: ~g~.
+
+Q: How do I follow to the current symbol's definition?
+A: ~M-.~.
+
+Q: How do I go back from there?
+A: =M-,=.
+
+Q: Does =M-,= also bring me back after ~g~?
+A: Yes.
+
+** Eval in more detail
+Q: Where do I see the result of the eval?
+A: In the minibuffer.
+
+Q: What if the result of the operation is =None=?
+A: Then =(ok)= is printed to confirm that the operation went through.
+
+Q: What if an uncaught exception is thrown?
+A: The exception will be displayed in the minibuffer, highlighted in
+red.
+
+Q: Is it possible to be productive without ever seeing the REPL
+buffer?
+A: Yes.
+
+Q: How do I see the REPL buffer?
+A: ~C-c C-z~.
+
+Q: Can I have more than one REPL session?
+A: Yes, use ~xp~ to select session or start a new one.
+
+Q: Does pressing ~e~ on a variable assignment output nothing because the
+result is =None=?
+A: No, magic is used to make it print the new value of the variable.
+
+Q: Where else is ~e~ magical?
+A: ~e~ on  =__file__= will print the actual file name.
+
+Q: Any more?
+A: ~e~ on a single line =return= statement will print the return result.
+
+Q: How do I insert the result of the eval into the buffer?
+A: ~E~.
+
+Q: How do I insert the result of the eval into the buffer as a
+comment?
+A: ~2e~.
+
+** Debugging
+Q: How do I step into an expression?
+A: ~xj~.
+
+Q: Where does this work?
+A: Function or method call, possibly with the result being assigned to
+a variable.
+
+Q: What does that do exactly?
+A: Evaluate the function arguments, jump to the function definition,
+and store the function arguments into global variable with appropriate
+names.
+
+Q: So if all I have is =sys.argv= I can use ~xj~ (combined with ~j~, ~l~ and
+~e~) to step into my program as deep as I want?
+A: Yes.
+
+Q: What if I just want to place a breakpoint to speed things up?
+A: To place a breakpoint, throw any exception. Then, enter
+=ok.uncrash()= into the REPL.
+
+Q: =ok.uncrash()= sounds weird, how can I see how it works?
+A: Enter into the REPL: =os.path.realpath(42)= which will raise an
+exception a few functions down the line. Then enter =import ok; ok.uncrash()=.
+
+Q: Wait, so this is like =pdb=?
+A: Yes, very similar.
+
+Q: So why go through the trouble?
+A: To get global variable context and proceed with ~e~ and ~j~.
+
+Q: Got it. Anyway, I see =File "/usr/lib/python2.7/posixpath.py",
+line 61, Frame [3/3]:=, what does it mean?
+A: =realpath= called =_joinrealpath=, which called =isabs=, which raised an
+Exception.
+
+Q: Three functions (=realpath=, =_joinrealpath=, and =isabs=), that's what
+3/3 means. And I'm in =isabs= now?
+A: Yes.
+
+Q: How do I open the source code for =isabs=?
+A: It's a link: use the mouse or =ace-link= or =next-error=.
+
+Q: I'm at the definition of =isabs= now, was its argument value stored
+somewhere?
+A: Yes, if you eval =s=, you get =42= - the value that propagated from
+=os.path.realpath(42)=.
+
+Q: =isabs= is boring. How do I go up the stack?
+A: Enter =up= into the REPL.
+
+Q: I entered up, and now the frame is 2/3 and
+I'm at =def _joinrealpath(path, rest, seen)=. Does this mean I can eval
+=path=, =rest=, and =seen= since they were propagated from the
+=os.path.realpath(42)= call?
+A: Yes.
+
+Q: And entering =up= again will bring me to 1/3 and =realpath=?
+A: Yes.
+
+Q: How do I go back down stack?
+A: Enter =dn=.
+
+** Notebooks
+Q: Is this like IPython?
+A: Yes.
+
+Q: But it's different how?
+A: You use Emacs instead of a browser, and the cells are
+self-contained in comments.
+
+Q: Sounds nice, but I'm not sold yet?
+A: It's like Org-mode embedded in Python code.
+
+Q: So I can fold / unfold each cell?
+A: Yes.
+
+Q: And eval/reeval it with ~e~?
+A: Yes.
+
+Q: How about organizing cells in a hierarchy?
+A: Also possible.
+
+Q: And ~e~ works on the hierarchy as well?
+A: Yes.
+
+Q: Are cells actually called different or something?
+A: Yes, they're outlines.
+
+Q: How do I make an outline named =Includes=?
+A: Enter =#* Includes=.
+
+Q: And like in Org-mode, the amount of stars is that outline's level?
+A: Yes.
+
+Q: Do ~M-left~ and ~M-right~ work like in Org-mode for promotion/demotion?
+A: Yes.
+
+Q: How to fold/unfold an outline?
+A: ~i~.
+
+Q: How do I fold/unfold all outlines?
+A: ~I~.
+
+Q: How do I make a table of contents?
+A: ~2I~.
+
+Q: When I press ~e~ on an outline it evaluates itself and the result is
+echoed; how do I make the result insert itself into the buffer
+instead?
+A: End the outline name in =:= (semicolon)
+
+Q: How do I clean up all inserted results?
+A: ~M-x~ =lpy-clean=.
+
+Q: Any more neat stuff about outlines?
+A: Yes, outlines are structured statements and parents to the
+top-level statements.
+
+Q: So ~j~ / ~k~ and ~h~ / ~l~, and even ~e~ treat outlines as statements? Neat.
+A: Yeah.
+
+** Completion
+Q: How do I get completion at point?
+A: Press ~C-M-i~.
+
+Q: Is this static completion or does it depend on the REPL state?
+A: Both. The static one is more convenient and is tried first. But the
+dynamic one is very reliable, since it knows exactly on which type of
+object you're operating.
+
+Q: But dynamic completion won't work unless my current object has a
+value in the REPL?
+A: Correct.
+
+Q: What's used for static completion?
+A: Jedi.
+
+** Inline hints
+Q: How do I look up the function arguments of the current function?
+A: Toggle ~C-2~.
+
+Q: What about the docstring?
+A: Toggle ~C-1~.
