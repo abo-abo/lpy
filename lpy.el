@@ -1155,7 +1155,6 @@ When ARG is 2, jump to tags in current dir."
 
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-M-o") 'lpy-back-to-outline)
     (define-key map (kbd "M-o") 'lpy-back-to-special)
     (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
