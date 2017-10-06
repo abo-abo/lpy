@@ -66,11 +66,11 @@
 (require 'org)
 
 (defconst lpy-font-lock-keywords
-  '(("^#\\(\\*[^*\n]?.*\\)$" 1 'org-level-1 prepend)
-    ("^#\\(\\*\\*[^*\n]?.*\\)$" 1 'org-level-2 prepend)
-    ("^#\\(\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-3 prepend)
-    ("^#\\(\\*\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-4 prepend)
-    ("^#\\(\\*\\*\\*\\*\\*[*\n]?.*\\)$" 1 'org-level-5 prepend)
+  '(("^# \\(\\*[^*\n]?.*\\)$" 1 'org-level-1 prepend)
+    ("^# \\(\\*\\*[^*\n]?.*\\)$" 1 'org-level-2 prepend)
+    ("^# \\(\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-3 prepend)
+    ("^# \\(\\*\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-4 prepend)
+    ("^# \\(\\*\\*\\*\\*\\*[*\n]?.*\\)$" 1 'org-level-5 prepend)
     (lpy-outline-comment-highlight 1 'default prepend)
     ;; ("^#  \\([^ ].*\\)$" 1 'default prepend)
     ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
@@ -227,7 +227,7 @@
       (t
        (outline-flag-region (car bnd) (cdr bnd) t)
        (cl-letf (((symbol-function 'org-unlogged-message) 'ignore))
-         (let ((org-outline-regexp "\\(?:#\\*+\\)\\|\\(?:^\\(?: *def\\)\\|^class \\)")
+         (let ((org-outline-regexp "\\(?:# \\*+\\)\\|\\(?:^\\(?: *def\\)\\|^class \\)")
                (orgstruct-mode t))
            (org-cycle-internal-local)))))))
 
@@ -366,7 +366,7 @@
       (line-beginning-position))))
 
 (defun lpy-next-top-level-sexp ()
-  (let* ((outline-regexp "#\\*+")
+  (let* ((outline-regexp "# \\*+")
          (end (lispy--outline-end)))
     (forward-char 1)
     (while (and (re-search-forward "^[^ \n]" end t)
@@ -375,7 +375,7 @@
     (forward-char -1)))
 
 (defun lpy-prev-top-level-sexp ()
-  (let* ((outline-regexp "#\\*+")
+  (let* ((outline-regexp "# \\*+")
          (beg (lispy--outline-beg)))
     (unless (eq beg 1)
       (cl-incf beg))
@@ -1218,14 +1218,13 @@ When ARG is 2, jump to tags in current dir."
       (define-key map x 'soap-command))
     map))
 
-(define-minor-mode lpy-mode
-  "Minor mode for navigating Python code similarly to LISP."
+(define-minor-mode lpy-mode "Minor mode for navigating Python code similarly to LISP."
   :keymap lpy-mode-map
   :lighter " LPY"
   (if lpy-mode
       (progn
         (setq lispy-outline-header "#")
-        (setq-local outline-regexp "#\\*+")
+        (setq-local outline-regexp "# \\*+")
         (setq-local lispy-outline (concat "^" outline-regexp))
         (setq-local outline-heading-end-regexp "\n")
         (setq-local outline-level 'lpy-outline-level)
