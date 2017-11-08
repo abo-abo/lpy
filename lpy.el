@@ -407,6 +407,12 @@
   (unless (bolp)
     (newline)))
 
+(defun lpy-multiline-string-bnd ()
+  (let (bnd)
+    (and (setq bnd (lispy--bounds-string))
+         (> (count-lines (car bnd) (cdr bnd)) 1)
+         bnd)))
+
 (defun lpy-down (arg)
   "Move down ARG times inside the current sexp."
   (interactive "p")
@@ -475,7 +481,7 @@
            (unless (catch 'done
                      (while (re-search-forward regex bound t)
                        (goto-char (1- (match-end 0)))
-                       (if (setq bnd (lispy--bounds-string))
+                       (if (setq bnd (lpy-multiline-string-bnd))
                            (goto-char (cdr bnd))
                          (throw 'done t))))
              (goto-char old-point))
@@ -597,7 +603,7 @@
              (while (re-search-backward regex bound t)
                (goto-char (- (match-end 0) 1))
                ;; triple quoted strings
-               (if (setq bnd (lispy--bounds-string))
+               (if (setq bnd (lpy-multiline-string-bnd))
                    (goto-char (car bnd))
                  (throw 'done t))))
            (unless (bolp)
@@ -1002,11 +1008,17 @@ When ARG is 2, jump to tags in current dir."
 
           ((and (setq bnd (lispy--bounds-string))
                 (> (point) (car bnd)))
-           (if (and (looking-back "\"")
-                    (looking-at "\""))
-               (insert "\"\"\"\"")
-             (insert "\\\"\\\""))
-           (backward-char 2))
+           (cond
+             ((eq (char-after (car bnd)) ?')
+              (insert "\"\"")
+              (backward-char))
+             ((and (looking-back "\"")
+                   (looking-at "\""))
+              (insert "\"\"\"\"")
+              (backward-char 2))
+             (t
+              (insert "\\\"\\\"")
+              (backward-char 2))))
           (t
            (unless (or (looking-back "^ *" (line-beginning-position))
                        (looking-back "\\s(" (line-beginning-position)))
