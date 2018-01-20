@@ -588,11 +588,11 @@
            (forward-char 1))
          (let* ((offset (current-column))
                 (bound (if (= offset 0)
-                           (1+ (condition-case nil
-                                   (save-excursion
-                                     (lpy-back-to-outline)
-                                     (point))
-                                 (error (point-min))))
+                           (condition-case nil
+                               (save-excursion
+                                 (lpy-back-to-outline)
+                                 (1+ (point)))
+                             (error (point-min)))
                          (save-excursion
                            (re-search-backward
                             (format "^%s[^ \n]" (make-string (- offset 4) 32))))))
