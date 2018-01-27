@@ -1165,9 +1165,20 @@ When ARG is 2, jump to tags in current dir."
       (run-python "python")
       (pop-to-buffer "*Python*"))))
 
+(defun lpy-yank ()
+  (interactive)
+  (let (bnd)
+    (if (and (setq bnd (lispy--bounds-string))
+             (not (= (point) (car bnd))))
+        (if (eq (char-after (car bnd)) ?\")
+            (insert (replace-regexp-in-string "\"" "\\\\\"" (current-kill 0)))
+          (insert (replace-regexp-in-string "'" "\\\\'" (current-kill 0))))
+      (yank))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-o") 'lpy-back-to-special)
+    (define-key map (kbd "C-y") 'lpy-yank)
     (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "C-k") 'lpy-kill-line)
