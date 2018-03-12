@@ -652,7 +652,7 @@
   (lispy--remember)
   (cond ((lpy-outline-p)
          (unless (zo-right 1)
-           (when (re-search-forward "^\\sw" (cdr (worf--bounds-subtree)) t)
+           (when (re-search-forward "^\\sw" (cdr (zo-bnd-subtree)) t)
              (backward-char))))
         ((lpy-line-left-p)
          (let* ((cur-offset (if (bolp) 0 (1+ (current-column))))
@@ -660,7 +660,7 @@
                 (regex (format "^%s[^ \n]" (make-string new-offset 32)))
                 (pt (point))
                 success)
-           (while (and (re-search-forward regex (cdr (worf--bounds-subtree)) t)
+           (while (and (re-search-forward regex (cdr (zo-bnd-subtree)) t)
                        (if (lispy--in-comment-p)
                            t
                          (setq success t)
