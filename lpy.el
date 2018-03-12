@@ -55,8 +55,8 @@
 
 (require 'lispy)
 (require 'worf)
-(require 'jedi nil t)
 (require 'soap)
+(require 'jedi nil t)
 (require 'flyspell nil t)
 
 (defgroup lpy nil
@@ -173,7 +173,7 @@
   (interactive)
   (cond ((or (lispy--in-comment-p)
              (looking-at lispy-outline))
-         (let* ((bnd (worf--end-positions))
+         (let* ((bnd (zo-bnd-subtree))
                 (eoh (car bnd))
                 (eos (cdr bnd)))
            (if (and (get-char-property (1- eos) 'invisible)
@@ -214,7 +214,7 @@
   "Toggle contents for the current outline."
   (interactive)
   (require 'org)
-  (let ((bnd (worf--end-positions)))
+  (let ((bnd (zo-bnd-subtree)))
     (cond
       ;; fully hidden
       ((get-char-property (car bnd) 'invisible)
