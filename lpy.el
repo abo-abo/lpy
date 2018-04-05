@@ -1179,6 +1179,7 @@ When ARG is 2, jump to tags in current dir."
     (define-key map (kbd "M-o") 'lpy-back-to-special)
     (define-key map (kbd "C-y") 'lpy-yank)
     (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
+    (define-key map (kbd "C-c C-c") 'lispy-eval-current-outline)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "C-k") 'lpy-kill-line)
     (define-key map (kbd "C-d") 'lpy-delete)
