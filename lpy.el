@@ -882,13 +882,12 @@
       (put 'lispy-recenter :line window-line)
       (recenter 0))))
 
-(require 'function-args)
-
 (defun lpy-goto (arg)
   "Select a tag to jump to from tags defined in current buffer.
 When ARG is 2, jump to tags in current dir."
   (interactive "p")
   (require 'semantic-directory)
+  (require 'function-args)
   (let* ((file-list
           (if (> arg 1)
               (cl-remove-if
