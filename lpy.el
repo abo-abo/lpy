@@ -6,6 +6,7 @@
 ;; URL: https://github.com/abo-abo/lpy
 ;; Version: 0.1.0
 ;; Keywords: python, lisp
+;; Package-Requires: ((zoutline "0.1.0"))
 
 ;; This file is not part of GNU Emacs
 
@@ -57,6 +58,7 @@
 (require 'soap)
 (require 'jedi nil t)
 (require 'flyspell nil t)
+(require 'zoutline)
 
 (defgroup lpy nil
   "List navigation and editing for Python."
