@@ -1244,6 +1244,7 @@ When ARG is 2, jump to tags in current dir."
       (define-key map x 'soap-command))
     map))
 
+;;;###autoload
 (define-minor-mode lpy-mode "Minor mode for navigating Python code similarly to LISP."
   :keymap lpy-mode-map
   :lighter " LPY"
