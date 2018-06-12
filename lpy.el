@@ -68,7 +68,7 @@
 (require 'org)
 
 (defconst lpy-font-lock-keywords
-  '(("^# ?\\(\\*[^*\n]?.*\\)$" 1 'org-level-1 prepend)
+  '(("^# ?\\(\\*\\|\\*[^*\n].*\\)$" 1 'org-level-1 prepend)
     ("^# ?\\(\\*\\*[^*\n]?.*\\)$" 1 'org-level-2 prepend)
     ("^# ?\\(\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-3 prepend)
     ("^# ?\\(\\*\\*\\*\\*[^*\n]?.*\\)$" 1 'org-level-4 prepend)
