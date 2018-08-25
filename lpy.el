@@ -1162,7 +1162,9 @@ When ARG is 2, jump to tags in current dir."
   (interactive)
   (let ((buffer (process-buffer (lispy--python-proc))))
     (if buffer
-        (pop-to-buffer buffer)
+        (progn
+          (pop-to-buffer buffer)
+          (add-to-list 'completion-at-point-functions 'lispy-python-completion-at-point))
       (run-python "python")
       (pop-to-buffer "*Python*"))))
 
