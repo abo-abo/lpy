@@ -1017,6 +1017,11 @@ When ARG is 2, jump to tags in current dir."
                    (looking-at "\""))
               (insert "\"\"\"\"")
               (backward-char 2))
+             ((string= (buffer-substring (car bnd)
+                                         (+ 3 (car bnd)))
+                       "\"\"\"")
+              (insert "\"\"")
+              (backward-char 1))
              (t
               (insert "\\\"\\\"")
               (backward-char 2))))
