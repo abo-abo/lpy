@@ -1034,11 +1034,14 @@ When ARG is 2, jump to tags in current dir."
 
 (defun lpy-split ()
   (interactive)
-  (if (lispy--in-string-p)
-      (progn
-        (insert "\"\n\"")
+  (let ((bnd (lispy--bounds-string)))
+    (if bnd
+        (let ((quote-str (string (char-after (car bnd)))))
+          (when (looking-back " +" (line-beginning-position))
+            (delete-region (match-beginning 0) (match-end 0)))
+          (insert quote-str "\n" quote-str)
         (indent-for-tab-command))
-    (indent-new-comment-line)))
+      (indent-new-comment-line))))
 
 (defun lpy-beginning-of-line ()
   (interactive)
