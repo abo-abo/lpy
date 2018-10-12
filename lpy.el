@@ -876,6 +876,22 @@
         (delete-region (car bnd) (cdr bnd))
         (delete-region (1- (line-beginning-position)) (point))))))
 
+(defun lpy-insert-prev-outline ()
+  (interactive)
+  (if (looking-back "^#.*\n")
+      (save-excursion
+        (insert
+         (save-excursion
+           (zo-up 1)
+           (goto-char (1+ (cdr (lispy--bounds-comment))))
+           (let ((beg (point))
+                 (bnd (worf--bounds-subtree)))
+             (while (and (< (point) (cdr bnd))
+                         (not (lispy--in-comment-p)))
+               (forward-line 1))
+             (buffer-substring-no-properties beg (1- (point)))))))
+    (avy-pop-mark)))
+
 (defun lpy-view ()
   (interactive)
   (let ((window-line (count-lines (window-start) (point))))
