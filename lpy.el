@@ -1198,9 +1198,14 @@ When ARG is 2, jump to tags in current dir."
   (let (bnd)
     (if (and (setq bnd (lispy--bounds-string))
              (not (= (point) (car bnd))))
-        (if (eq (char-after (car bnd)) ?\")
-            (insert (replace-regexp-in-string "\"" "\\\\\"" (current-kill 0)))
-          (insert (replace-regexp-in-string "'" "\\\\'" (current-kill 0))))
+        (cond
+          ((string= (buffer-substring (car bnd)
+                                      (+ 3 (car bnd))) "\"\"\"")
+           (insert (current-kill 0)))
+          ((eq (char-after (car bnd)) ?\")
+           (insert (replace-regexp-in-string "\"" "\\\\\"" (current-kill 0))))
+          (t
+           (insert (replace-regexp-in-string "'" "\\\\'" (current-kill 0)))))
       (yank))))
 
 (defvar lpy-mode-map
