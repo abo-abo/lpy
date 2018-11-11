@@ -1044,7 +1044,8 @@ When ARG is 2, jump to tags in current dir."
           (t
            (unless (or (looking-back "^ *" (line-beginning-position))
                        (looking-back "\\s(" (line-beginning-position))
-                       (looking-back "[,(] *\\(\\sw\\|\\s_\\)+=" (line-beginning-position)))
+                       (looking-back "[,(] *\\(\\sw\\|\\s_\\)+=" (line-beginning-position))
+                       (looking-back "\\bf" (line-beginning-position)))
              (just-one-space))
            (insert "\"\"")
            (backward-char)))))
