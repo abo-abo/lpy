@@ -846,7 +846,7 @@
           (make-string (max (lispy-outline-level) 1)
                        ?\*)
           " ")
-  (beginning-of-line))
+  (end-of-line))
 
 (defun lpy-backward ()
   (interactive)
