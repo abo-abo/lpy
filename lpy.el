@@ -1103,7 +1103,12 @@ When ARG is 2, jump to tags in current dir."
   (interactive)
   (cond
     ((region-active-p)
-     (delete-active-region))
+     (delete-active-region)
+     (delete-region (line-beginning-position)
+                    (1+ (line-end-position)))
+     (back-to-indentation)
+     (unless (bolp)
+       (backward-char)))
     ((looking-at " *$")
      (let ((offset (mod (current-column) 4)))
        (delete-region (point) (1+ (match-end 0)))
