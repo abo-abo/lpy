@@ -779,6 +779,11 @@
   (let (bnd)
     (cond ((region-active-p)
            (deactivate-mark))
+          ((and (looking-at " ?#")
+                (save-excursion
+                  (forward-char 1)
+                  (setq bnd (lispy--bounds-comment))))
+           (set-mark (cdr bnd)))
           ((setq bnd (lispy-bounds-python-block))
            (lispy--mark bnd)
            (exchange-point-and-mark)
