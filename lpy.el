@@ -950,7 +950,9 @@ When ARG is 2, jump to tags in current dir."
     (moo-select-candidate
      ready-tags
      #'moo-action-jump
-     preselect)))
+     preselect)
+    (unless (or (bolp) (looking-at " "))
+      (backward-char 1))))
 
 (defun lpy-tag-name (tag)
   (let* ((class (semantic-tag-class tag))
