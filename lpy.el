@@ -1088,16 +1088,20 @@ When ARG is 2, jump to tags in current dir."
 
 (defun lpy-delete ()
   (interactive)
-  (if (looking-at " *$")
-      (let ((offset (mod (current-column) 4)))
-        (delete-region (point) (1+ (match-end 0)))
-        (when (looking-at " +")
-          (delete-region (match-beginning 0)
-                         (match-end 0)))
-        (indent-for-tab-command)
-        (when (= offset 3)
-          (backward-char 1)))
-    (delete-char 1)))
+  (cond
+    ((region-active-p)
+     (delete-active-region))
+    ((looking-at " *$")
+     (let ((offset (mod (current-column) 4)))
+       (delete-region (point) (1+ (match-end 0)))
+       (when (looking-at " +")
+         (delete-region (match-beginning 0)
+                        (match-end 0)))
+       (indent-for-tab-command)
+       (when (= offset 3)
+         (backward-char 1))))
+    (t
+     (delete-char 1))))
 
 (defun lpy-import-from-markdown ()
   "Use after jupyter nbconvert --to markdown."
