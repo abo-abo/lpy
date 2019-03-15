@@ -465,30 +465,35 @@
         ((lpy-line-left-p)
          (when (looking-at " ")
            (forward-char 1))
-         (let* ((offset (current-column))
-                (bound (if (= offset 0)
+         (let (bnd)
+           (if (setq bnd (lispy--bounds-comment))
+               (progn
+                 (goto-char (cdr bnd))
+                 (back-to-indentation)))
+           (let* ((offset (current-column))
+                  (bound (if (= offset 0)
+                             (save-excursion
+                               (or (outline-next-heading)
+                                   (point-max)))
                            (save-excursion
-                             (or (outline-next-heading)
-                                 (point-max)))
-                         (save-excursion
-                           (or (re-search-forward
-                                (format "^%s[^ \n]" (make-string (- offset 4) 32))
-                                nil t)
-                               (point-max)))))
-                (regex (format "^%s[^ \n]" (buffer-substring-no-properties
-                                            (line-beginning-position) (point))))
-                (old-point (point))
-                bnd)
-           (forward-char 1)
-           (unless (catch 'done
-                     (while (re-search-forward regex bound t)
-                       (goto-char (1- (match-end 0)))
-                       (if (setq bnd (lpy-multiline-string-bnd))
-                           (goto-char (cdr bnd))
-                         (throw 'done t))))
-             (goto-char old-point))
-           (unless (bolp)
-             (backward-char 1))))))
+                             (or (re-search-forward
+                                  (format "^%s[^ \n]" (make-string (- offset 4) 32))
+                                  nil t)
+                                 (point-max)))))
+                  (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                                              (line-beginning-position) (point))))
+                  (old-point (point))
+                  bnd)
+             (forward-char 1)
+             (unless (catch 'done
+                       (while (re-search-forward regex bound t)
+                         (goto-char (1- (match-end 0)))
+                         (if (setq bnd (lpy-multiline-string-bnd))
+                             (goto-char (cdr bnd))
+                           (throw 'done t))))
+               (goto-char old-point))
+             (unless (bolp)
+               (backward-char 1)))))))
 
 (defun lpy-bounds-defun ()
   (save-excursion
