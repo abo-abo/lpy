@@ -613,6 +613,9 @@
                (if (setq bnd (lpy-multiline-string-bnd))
                    (goto-char (car bnd))
                  (throw 'done t))))
+           (let (bnd)
+             (when (setq bnd (lispy--bounds-comment))
+               (goto-char (car bnd))))
            (unless (bolp)
              (backward-char 1))))))
 
