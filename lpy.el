@@ -709,11 +709,16 @@
 
 (defun lpy-mark-symbol ()
   (interactive)
-  (if (looking-at "(")
-      (progn
-        (mark-sexp)
-        (exchange-point-and-mark))
-    (lispy--mark (bounds-of-thing-at-point 'symbol))))
+  (let (bnd)
+    (cond ((looking-at "(")
+           (mark-sexp)
+           (exchange-point-and-mark))
+          ((and (looking-at "\"")
+                (setq bnd (lispy--bounds-string))
+                (= (car bnd) (point)))
+           (lispy--mark bnd))
+          (t
+           (lispy--mark (bounds-of-thing-at-point 'symbol))))))
 
 (defvar lpy-no-space t
   "When non-nil, don't insert a space before parens.")
