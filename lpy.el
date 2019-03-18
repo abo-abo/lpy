@@ -713,9 +713,11 @@
     (cond ((looking-at "(")
            (mark-sexp)
            (exchange-point-and-mark))
-          ((and (looking-at "\"")
-                (setq bnd (lispy--bounds-string))
-                (= (car bnd) (point)))
+          ((and (looking-at " ?\\(\"\\)")
+                (save-excursion
+                  (goto-char (match-beginning 1))
+                  (setq bnd (lispy--bounds-string))
+                  (= (car bnd) (point))))
            (lispy--mark bnd))
           (t
            (lispy--mark (bounds-of-thing-at-point 'symbol))))))
