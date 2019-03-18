@@ -1208,13 +1208,26 @@ When ARG is 2, jump to tags in current dir."
     (when (null ivy-exit)
       (goto-char swiper--opoint))))
 
+(defun lpy-follow-dbg-links-filter (output)
+  (let ((regex "^  File \"[^\"]+\", line [0-9]+"))
+    (when (string-match regex output)
+      ;; wait for `comint-output-filter' to insert the string into the buffer
+      (run-at-time nil nil
+                   (lambda ()
+                     (save-excursion
+                       (when (re-search-backward regex nil t)
+                         (save-selected-window
+                           (compile-goto-error))))))))
+  output)
+
 (defun lpy-switch-to-shell ()
   (interactive)
   (let ((buffer (process-buffer (lispy--python-proc))))
     (if buffer
         (progn
           (pop-to-buffer buffer)
-          (add-to-list 'completion-at-point-functions 'lispy-python-completion-at-point))
+          (add-to-list 'completion-at-point-functions 'lispy-python-completion-at-point)
+          (add-hook 'comint-output-filter-functions 'lpy-follow-dbg-links-filter))
       (run-python "python")
       (pop-to-buffer "*Python*"))))
 
