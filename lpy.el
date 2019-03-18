@@ -784,6 +784,7 @@
 
 (defun lpy-mark ()
   (interactive)
+  (lispy--remember)
   (let (bnd)
     (cond ((region-active-p)
            (deactivate-mark))
