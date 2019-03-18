@@ -1227,7 +1227,9 @@ When ARG is 2, jump to tags in current dir."
         (progn
           (pop-to-buffer buffer)
           (add-to-list 'completion-at-point-functions 'lispy-python-completion-at-point)
-          (add-hook 'comint-output-filter-functions 'lpy-follow-dbg-links-filter))
+          (add-hook 'comint-output-filter-functions 'lpy-follow-dbg-links-filter)
+          (when (equal (buffer-string) "")
+            (comint-send-input)))
       (run-python "python")
       (pop-to-buffer "*Python*"))))
 
