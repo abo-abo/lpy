@@ -709,6 +709,7 @@
 
 (defun lpy-mark-symbol ()
   (interactive)
+  (lispy--remember)
   (let (bnd)
     (cond ((looking-at "(")
            (mark-sexp)
