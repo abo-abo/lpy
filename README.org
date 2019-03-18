@@ -108,11 +108,11 @@ A: Yes.
 
 Q: What if I just want to place a breakpoint to speed things up?
 A: To place a breakpoint, throw any exception. Then, enter
-=ok.uncrash()= into the REPL.
+=lp.pm()= into the REPL.
 
-Q: =ok.uncrash()= sounds weird, how can I see how it works?
+Q: =lp.pm()= sounds weird, how can I see how it works?
 A: Enter into the REPL: =os.path.realpath(42)= which will raise an
-exception a few functions down the line. Then enter =import ok; ok.uncrash()=.
+exception a few functions down the line. Then enter =lp.pm()=.
 
 Q: Wait, so this is like =pdb=?
 A: Yes, very similar.
