@@ -1257,12 +1257,19 @@ When ARG is 2, jump to tags in current dir."
            (insert (replace-regexp-in-string "'" "\\\\'" (current-kill 0)))))
       (yank))))
 
+(defun lpy-eval-buffer ()
+  (interactive)
+  (lispy--eval (buffer-substring-no-properties
+                (point-min)
+                (point-max))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-o") 'lpy-back-to-special)
     (define-key map (kbd "C-y") 'lpy-yank)
     (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
     (define-key map (kbd "C-c C-c") 'lispy-eval-current-outline)
+    (define-key map (kbd "C-c C-l") 'lpy-eval-buffer)
     (define-key map (kbd "C-a") 'lpy-beginning-of-line)
     (define-key map (kbd "C-k") 'lpy-kill-line)
     (define-key map (kbd "C-d") 'lpy-delete)
