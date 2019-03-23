@@ -1218,13 +1218,14 @@ When ARG is 2, jump to tags in current dir."
       (goto-char swiper--opoint))))
 
 (defun lpy-follow-dbg-links-filter (output)
-  (let ((regex "^  File \"[^\"]+\", line [0-9]+"))
+  (let ((regex "^  File \"\\([^\"]+\\)\", line [0-9]+"))
     (when (string-match regex output)
       ;; wait for `comint-output-filter' to insert the string into the buffer
       (run-at-time nil nil
                    (lambda ()
                      (save-excursion
-                       (when (re-search-backward regex nil t)
+                       (when (and (re-search-backward regex nil t)
+                                  (file-exists-p (match-string 1)))
                          (save-selected-window
                            (compile-goto-error))))))))
   output)
