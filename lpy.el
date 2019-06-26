@@ -1260,9 +1260,13 @@ When ARG is 2, jump to tags in current dir."
 
 (defun lpy-eval-buffer ()
   (interactive)
-  (lispy--eval (buffer-substring-no-properties
-                (point-min)
-                (point-max))))
+  (let ((res (lispy--eval
+              (buffer-substring-no-properties
+               (point-min)
+               (point-max)))))
+    (if res
+        (lispy-message res)
+      (lispy-message lispy-eval-error))))
 
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
