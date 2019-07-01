@@ -720,6 +720,9 @@
                   (setq bnd (lispy--bounds-string))
                   (= (car bnd) (point))))
            (lispy--mark bnd))
+          ((looking-at " ")
+           (skip-chars-forward " ")
+           (lispy--mark (bounds-of-thing-at-point 'symbol)))
           (t
            (lispy--mark (bounds-of-thing-at-point 'symbol))))))
 
