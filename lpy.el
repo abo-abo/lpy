@@ -716,10 +716,15 @@
       ;; Unmark with "b b b"
       ((region-active-p)
        (when (looking-at "\\.")
-         (forward-char)
-         (or (prog1 (search-forward "." (line-end-position) t)
-               (backward-char))
-             (forward-sexp 1))))
+         (let ((end
+                (save-excursion
+                  (goto-char (region-beginning))
+                  (with-syntax-table python-dotty-syntax-table
+                    (+ (point) (length (symbol-name (symbol-at-point))))))))
+           (forward-char)
+           (or (prog1 (search-forward "." end t)
+                 (backward-char))
+               (forward-sexp 1)))))
       ((looking-at "(")
        (mark-sexp)
        (exchange-point-and-mark))
