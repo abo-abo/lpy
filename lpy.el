@@ -711,20 +711,29 @@
   (interactive)
   (lispy--remember)
   (let (bnd)
-    (cond ((looking-at "(")
-           (mark-sexp)
-           (exchange-point-and-mark))
-          ((and (looking-at " ?\\(\"\\)")
-                (save-excursion
-                  (goto-char (match-beginning 1))
-                  (setq bnd (lispy--bounds-string))
-                  (= (car bnd) (point))))
-           (lispy--mark bnd))
-          ((looking-at " ")
-           (skip-chars-forward " ")
-           (lispy--mark (bounds-of-thing-at-point 'symbol)))
-          (t
-           (lispy--mark (bounds-of-thing-at-point 'symbol))))))
+    (cond
+      ;; Gradually mark e.g. self.foo.bar with "M-m M-m M-m"
+      ;; Unmark with "b b b"
+      ((region-active-p)
+       (when (looking-at "\\.")
+         (forward-char)
+         (or (prog1 (search-forward "." (line-end-position) t)
+               (backward-char))
+             (forward-sexp 1))))
+      ((looking-at "(")
+       (mark-sexp)
+       (exchange-point-and-mark))
+      ((and (looking-at " ?\\(\"\\)")
+            (save-excursion
+              (goto-char (match-beginning 1))
+              (setq bnd (lispy--bounds-string))
+              (= (car bnd) (point))))
+       (lispy--mark bnd))
+      ((looking-at " ")
+       (skip-chars-forward " ")
+       (lispy--mark (bounds-of-thing-at-point 'symbol)))
+      (t
+       (lispy--mark (bounds-of-thing-at-point 'symbol))))))
 
 (defvar lpy-no-space t
   "When non-nil, don't insert a space before parens.")
