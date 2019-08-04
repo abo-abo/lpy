@@ -209,8 +209,9 @@
              (move-beginning-of-line 2))
            (goto-char beg)))
         (t
-         (let ((forward-sexp-function nil))
-           (indent-sexp)))))
+         ;; (let ((forward-sexp-function nil))
+         ;;   (indent-sexp))
+         )))
 
 (defun lpy-contents ()
   "Toggle contents for the current outline."
