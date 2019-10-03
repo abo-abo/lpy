@@ -1279,10 +1279,14 @@ When ARG is 2, jump to tags in current dir."
 (defun lpy-eval-buffer ()
   (interactive)
   (if (process-live-p (lispy--python-proc))
-      (let ((res (lispy--eval
-                  (buffer-substring-no-properties
-                   (point-min)
-                   (point-max)))))
+      (let ((res
+             (progn
+               (lispy--eval
+                (format "import os; os.chdir('%s')" default-directory))
+               (lispy--eval
+                (buffer-substring-no-properties
+                 (point-min)
+                 (point-max))))))
         (if res
             (lispy-message res)
           (lispy-message lispy-eval-error)))
