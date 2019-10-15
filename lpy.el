@@ -828,7 +828,6 @@
            (lispy-mark)))))
 
 (defun lpy-slurp ()
-  (interactive)
   (cond ((and (region-active-p)
               (lpy-listp))
          (cond ((lpy-arg-rightp)
@@ -841,7 +840,6 @@
          (soap-command))))
 
 (defun lpy-barf ()
-  (interactive)
   (cond ((and (region-active-p)
               (lpy-listp))
          (cond ((lpy-arg-rightp)
@@ -1352,8 +1350,8 @@ When ARG is 2, jump to tags in current dir."
     (lpy-define-key map "K" 'lispy-outline-prev)
     (lpy-define-key map "N" 'lispy-narrow)
     (lpy-define-key map "W" 'lispy-widen)
-    (define-key map ">" 'lpy-slurp)
-    (define-key map "<" 'lpy-barf)
+    (define-key map ">" 'soap-command)
+    (define-key map "<" 'soap-command)
     (dolist (x (number-sequence 0 9))
       (lpy-define-key map (format "%d" x) 'digit-argument))
     (dolist (x '("+" "-" "%" "&" "|" "=" ","))
