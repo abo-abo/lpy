@@ -216,23 +216,11 @@
 (defun lpy-contents ()
   "Toggle contents for the current outline."
   (interactive)
-  (require 'org)
   (let ((bnd (zo-bnd-subtree)))
-    (cond
-      ;; fully hidden
-      ((get-char-property (car bnd) 'invisible)
-       (outline-flag-region (car bnd) (cdr bnd) nil)
-       (lpy-contents))
-      ;; contents
-      ((get-char-property (1- (cdr bnd)) 'invisible)
-       (outline-flag-region (car bnd) (cdr bnd) nil))
-      ;; fully revealed
-      (t
-       (outline-flag-region (car bnd) (cdr bnd) t)
-       (cl-letf (((symbol-function 'org-unlogged-message) 'ignore))
-         (let ((org-outline-regexp "\\(?:# ?\\*+\\)\\|\\(?:^\\(?: *def\\)\\|^class \\)")
-               (orgstruct-mode t))
-           (org-cycle-internal-local)))))))
+    (if (get-char-property (car bnd) 'invisible)
+        (outline-show-subtree)
+      (outline-show-subtree)
+      (outline-hide-body))))
 
 (defun lpy--insert-or-call (def)
   `(lambda ()
