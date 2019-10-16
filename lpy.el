@@ -78,9 +78,9 @@
     ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
 
 (defun lpy-fill-forward-paragraph-function (&optional arg)
-  (let (bnd str)
+  (let (bnd)
     (if (and (setq bnd (lispy--bounds-string))
-             (string-match "\\`\"\"\"" (setq str (lispy--string-dwim bnd))))
+             (string-match "\\`\"\"\"" (lispy--string-dwim bnd)))
         (goto-char (cdr bnd))
       (forward-paragraph arg))))
 
@@ -506,8 +506,7 @@
   (if (looking-at lispy-outline)
       (lpy-add-outline)
     (deactivate-mark)
-    (let ((bnd (lpy-bounds-defun))
-          (avy-action 'lpy-avy-symbol-action)
+    (let ((avy-action 'lpy-avy-symbol-action)
           (avy-handler-function (lambda (_) (throw 'done 'exit))))
       (lispy--avy-do
        "\\_<\\sw"
@@ -646,7 +645,7 @@
     (back-to-indentation)
     (- (point) (line-beginning-position))))
 
-(defun lpy-right (arg)
+(defun lpy-right (_arg)
   (interactive "p")
   (lispy--remember)
   (cond ((lpy-outline-p)
@@ -669,8 +668,7 @@
              (goto-char pt))
            (unless (or (bolp) (looking-at " "))
              (backward-char 1))))
-        ((eolp)
-         (let ((lvl (lpy-lvl)))))
+        ((eolp))
         (t
          (self-insert-command 1))))
 
@@ -904,14 +902,14 @@
 
 (defun lpy-insert-prev-outline ()
   (interactive)
-  (if (looking-back "^#.*\n")
+  (if (looking-back "^#.*\n" (line-beginning-position 0))
       (save-excursion
         (insert
          (save-excursion
            (zo-up 1)
            (goto-char (1+ (cdr (lispy--bounds-comment))))
            (let ((beg (point))
-                 (bnd (worf--bounds-subtree)))
+                 (bnd (zo-bnd-subtree)))
              (while (and (< (point) (cdr bnd))
                          (not (lispy--in-comment-p)))
                (forward-line 1))
@@ -926,6 +924,9 @@
         (recenter (or (get 'lispy-recenter :line) 0))
       (put 'lispy-recenter :line window-line)
       (recenter 0))))
+
+(defvar sd-force-reparse)
+(defvar moo-jump-local-cache)
 
 (defun lpy-goto (arg)
   "Select a tag to jump to from tags defined in current buffer.
@@ -1057,7 +1058,7 @@ When ARG is 2, jump to tags in current dir."
              ((eq (char-after (car bnd)) ?')
               (insert "\"\"")
               (backward-char))
-             ((and (looking-back "\"")
+             ((and (looking-back "\"" (line-beginning-position))
                    (looking-at "\""))
               (insert "\"\"\"\"")
               (backward-char 2))
@@ -1148,8 +1149,7 @@ When ARG is 2, jump to tags in current dir."
     (erase-buffer)
     (insert-file-contents md-name)
     (goto-char (point-min))
-    (let ((in-code nil)
-          (idx -1)
+    (let ((idx -1)
           (lvl 0))
       (while (re-search-forward "^\\(```\\|#+\\)" nil t)
         (if (string= (match-string 1) "```")
