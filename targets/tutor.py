@@ -25,12 +25,25 @@
 
 #* Lesson 1
 # You can press =k= to go back to the introduction.
-# Or press =e= to eval the current outline.
+# Or press =l= to go to the first child outline.
 
 #** Python version:
+# You can press =h= to go back to Lesson 1.
+#
+# Or press =e= to eval the current outline and move to the next one.
+# Since this outline ends in ":", the result will be inserted into the
+# buffer as a comment.
 import sys
 print(sys.version)
 
 #** Your OS version:
+# You can press =e= to eval this outline.
+#
+# Or press =h= to go to the parent and =e= to eval the parent.
+# Evaluating the parent means evaluating all children outlines.
 import os
 os.uname()
+
+#** Clean up results
+# You can press =C= to clean up the evaluated results
+# Try pressing =CkkeeC=.
