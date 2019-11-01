@@ -1,3 +1,12 @@
+(advice-add
+ 'save-buffers-kill-emacs
+ :around
+ (lambda (orig-fn &rest args)
+   (cl-letf (((symbol-function #'process-list) #'ignore))
+     (apply orig-fn args))))
+(setq backup-by-copying t)
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+
 (require 'lpy)
 
 (use-package ivy
@@ -10,13 +19,6 @@
   (setq jedi:setup-function nil)
   (setf (symbol-function #'jedi:handle-post-command) (lambda nil nil)))
 
-(advice-add
- 'save-buffers-kill-emacs
- :around
- (lambda (orig-fn &rest args)
-   (cl-letf (((symbol-function #'process-list) #'ignore))
-     (apply orig-fn args))))
-
 (defun lpy-python-hook ()
   (lpy-mode)
   (company-mode)
@@ -26,3 +28,5 @@
   (electric-indent-mode -1))
 
 (add-hook 'python-mode-hook 'lpy-python-hook)
+
+(find-file "targets/tutor.py")
