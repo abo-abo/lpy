@@ -24,13 +24,20 @@
 # Press =i= to show/hide the lesson.
 
 #* Lesson 1
+# You are now on an outline, since your point is before "#*".
+# Since there is one "*", this is a first level outline.
+#
 # You can press =k= to go back to the introduction.
 # Or press =l= to go to the first child outline.
 
 #** Python version:
+# You are now on an outline, since your point is before "#**".
+# Since there are two "*", this is a second level outline, a child of Lesson 1.
+#
 # You can press =h= to go back to Lesson 1.
 #
 # Or press =e= to eval the current outline and move to the next one.
+#
 # Since this outline ends in ":", the result will be inserted into the
 # buffer as a comment.
 import sys
@@ -47,3 +54,20 @@ os.uname()
 #** Clean up results
 # You can press =C= to clean up the evaluated results
 # Try pressing =CkkeeC=.
+#
+# You can use =j= and =k= to traverse outlines in a structured way,
+# i.e. go from outline level 2 to the next outline level 2, even
+# though the next closest outlint is an outline level 3.
+#
+# To traverse outlines in an unstructured way, use =J= and =K=.  This
+# is useful now to move from a level 2 outline to Lesson 2, which is a
+# level 1 outline.
+
+#* Lesson 2
+# In the same way as you use =l= to descend into a child outline, you
+# can descent into code.
+# You can step through the code with =j= and eval it with =e=.
+x = 10
+x + x
+if x > 1:
+    print("x:", x)
