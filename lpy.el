@@ -521,16 +521,29 @@
        'at-full))))
 
 (defun lpy-add-outline ()
-  (when (save-excursion
-          (forward-char 1)
-          (not (re-search-forward "^#\\*+ ?" nil t)))
-    (goto-char (point-max))
-    (skip-chars-backward "\n ")
-    (delete-region (point) (point-max))
-    (let ((lvl (save-excursion
-                 (lpy-back-to-outline)
-                 (lispy-outline-level))))
-      (insert "\n\n#" (make-string lvl ?\*) " :\n"))))
+  (let ((bnd (zo-bnd-subtree))
+        (lvl (lispy-outline-level))
+        (outline
+         (when (looking-at (concat lispy-outline-header "\\*+ :$"))
+           (concat (match-string-no-properties 0) "\n\n"))))
+    (goto-char (cdr bnd))
+    (cond
+      ((<= (- (point-max) (point)) 1)
+       (newline)
+       (newline))
+      ((looking-at "\n\n")
+       (forward-char)
+       (newline)
+       (backward-char))
+      (t
+       (newline)))
+    (if outline
+        (progn
+          (insert outline)
+          (backward-char))
+      (insert lispy-outline-header
+              (make-string lvl ?\*)
+              " "))))
 
 (defun lpy-up (arg)
   "Move up ARG times inside the current sexp."
