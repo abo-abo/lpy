@@ -1360,6 +1360,7 @@ When ARG is 2, jump to tags in current dir."
         (setq-local fill-paragraph-function 'lpy-fill-paragraph)
         (setq-local fill-forward-paragraph-function 'lpy-fill-forward-paragraph-function)
         (setq-local completion-at-point-functions '(lispy-python-completion-at-point t))
+        (setq-local lispy-no-space t)
         ;; (setq-local forward-sexp-function 'lpy-forward-sexp-function)
         (font-lock-add-keywords major-mode lpy-font-lock-keywords))
     (font-lock-remove-keywords major-mode lpy-font-lock-keywords)

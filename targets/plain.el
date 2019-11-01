@@ -24,7 +24,6 @@
   (setq jedi:environment-virtualenv python-environment-virtualenv)
   (setq-local company-backends '(company-jedi company-dabbrev-code company-keywords))
   (setq-local completion-at-point-functions '(lispy-python-completion-at-point t))
-  (setq-local lispy-no-space t)
   (electric-indent-mode -1))
 
 (add-hook 'python-mode-hook 'lpy-python-hook)
