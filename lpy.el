@@ -899,7 +899,8 @@
     (while (re-search-forward "^ *# =>" nil t)
       (let ((bnd (lispy--bounds-comment)))
         (delete-region (car bnd) (cdr bnd))
-        (delete-region (1- (line-beginning-position)) (point))))))
+        (delete-region (1- (line-beginning-position)) (point))))
+    (save-buffer)))
 
 (defun lpy-insert-prev-outline ()
   (interactive)
@@ -928,6 +929,15 @@
 
 (defvar sd-force-reparse)
 (defvar moo-jump-local-cache)
+(declare-function moo-flatten-namepaces "ext:function-args")
+(declare-function moo-format-tag-line "ext:function-args")
+(declare-function moo-select-candidate "ext:function-args")
+(declare-function moo-action-jump "ext:function-args")
+(declare-function sd-fetch-tags "ext:function-args")
+(declare-function semantic-tag-get-attribute "tag")
+(declare-function semantic-tag-class "tag")
+(declare-function semantic-tag-overlay "tag")
+(declare-function compile-goto-error "compile")
 
 (defun lpy-goto (arg)
   "Select a tag to jump to from tags defined in current buffer.
@@ -1332,6 +1342,7 @@ When ARG is 2, jump to tags in current dir."
     (lpy-define-key map "y" 'lpy-occur)
     (lpy-define-key map "z" 'self-insert-command)
     (lpy-define-key map "B" 'lispy-ediff-regions)
+    (lpy-define-key map "C" 'lpy-clean)
     (lpy-define-key map "D" 'pop-tag-mark)
     (lpy-define-key map "F" 'lispy-goto-symbol)
     (lpy-define-key map "I" 'lispy-shifttab)
