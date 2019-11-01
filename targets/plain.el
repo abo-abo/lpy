@@ -10,6 +10,13 @@
   (setq jedi:setup-function nil)
   (setf (symbol-function #'jedi:handle-post-command) (lambda nil nil)))
 
+(advice-add
+ 'save-buffers-kill-emacs
+ :around
+ (lambda (orig-fn &rest args)
+   (cl-letf (((symbol-function #'process-list) #'ignore))
+     (apply orig-fn args))))
+
 (defun lpy-python-hook ()
   (lpy-mode)
   (company-mode)
