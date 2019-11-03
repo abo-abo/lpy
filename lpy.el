@@ -75,8 +75,7 @@
     ("^# ?\\(\\*\\{5\\}\\|\\*\\{5\\}[^*\n].*\\)$" 1 'org-level-5 prepend)
     (lpy-outline-comment-highlight 1 'default prepend)
     ;; ("^#  \\([^ ].*\\)$" 1 'default prepend)
-    ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)
-    ("=\\([^\n=]+\\)=" 1 font-lock-builtin-face prepend)))
+    ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
 
 (defun lpy-fill-forward-paragraph-function (&optional arg)
   (let (bnd)
