@@ -590,7 +590,7 @@
                     (exchange-point-and-mark)
                     (lpy-barf)))
 
-           (lispy-down arg)))
+           (lispy-up arg)))
         ((lpy-line-left-p)
          (when (looking-at " ")
            (forward-char 1))
