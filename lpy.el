@@ -608,8 +608,10 @@
                                  (1+ (point)))
                              (error (point-min)))
                          (save-excursion
-                           (re-search-backward
-                            (format "^%s[^ \n]" (make-string (- offset 4) 32))))))
+                           (while (and (re-search-backward
+                                        (format "^%s[^ \n]" (make-string (- offset 4) 32)))
+                                       (lispy--in-string-or-comment-p)))
+                           (point))))
                 (regex (format "^%s[^ \n]" (buffer-substring-no-properties
                                             (line-beginning-position) (point))))
                 bnd)
