@@ -800,6 +800,9 @@
       (lispy-pam-restore 'lpy-back-to-special)
     (lispy-pam-store 'lpy-back-to-special)
     (back-to-indentation)
+    (let (bnd)
+      (when (setq bnd (lispy--bounds-string))
+        (goto-char (car bnd))))
     (unless (bolp)
       (backward-char))))
 
