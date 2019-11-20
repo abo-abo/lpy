@@ -465,10 +465,16 @@
                                (or (outline-next-heading)
                                    (point-max)))
                            (save-excursion
-                             (or (re-search-forward
-                                  (format "^%s[^ \n]" (make-string (- offset 4) 32))
-                                  nil t)
-                                 (point-max)))))
+                             (or
+                              (let ((match-found nil))
+                                (while (and (re-search-forward
+                                             (format "^%s[^ \n]" (make-string (- offset 4) 32))
+                                             nil t)
+                                            (setq match-found t)
+                                            (lispy--in-string-or-comment-p)))
+                                (if match-found
+                                    (point)))
+                              (point-max)))))
                   (regex (format "^%s[^ \n]" (buffer-substring-no-properties
                                               (line-beginning-position) (point))))
                   (old-point (point))
