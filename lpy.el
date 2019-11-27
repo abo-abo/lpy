@@ -232,7 +232,8 @@
      (cond ((region-active-p)
             (call-interactively ',def))
 
-           ((lispy--in-string-or-comment-p)
+           ((or (lispy--in-string-or-comment-p)
+                (eq last-command 'python-indent-dedent-line-backspace))
             (call-interactively 'self-insert-command))
 
            ((or (lpy-line-left-p)
