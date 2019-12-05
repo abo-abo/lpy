@@ -1325,9 +1325,25 @@ When ARG is 2, jump to tags in current dir."
           (lispy-message lispy-eval-error)))
     (error "No process")))
 
+(defun lpy-iedit ()
+  (interactive)
+  (if (or current-prefix-arg
+          (let ((re (concat "\\_<" (ivy-thing-at-point) "\\_>"))
+                (pt (point)))
+            (save-excursion
+              (save-restriction
+                (narrow-to-defun)
+                (if (/= (point) pt)
+                    t
+                  (goto-char (point-min))
+                  (not (re-search-forward re nil t 2)))))))
+      (iedit-mode)
+    (iedit-mode 0)))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-o") 'lpy-back-to-special)
+    (define-key map (kbd "M-i") 'lpy-iedit)
     (define-key map (kbd "C-y") 'lpy-yank)
     (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
     (define-key map (kbd "C-c C-c") 'lispy-eval-current-outline)
