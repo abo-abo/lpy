@@ -409,87 +409,88 @@
   "Move down ARG times inside the current sexp."
   (interactive "p")
   (lispy--remember)
-  (cond ((lpy-line-p)
-         (let ((beg (region-beginning))
-               (end (region-end))
-               (leftp (= (point) (region-beginning)))
-               indent)
-           (goto-char beg)
-           (setq indent (concat
-                         "^"
-                         (buffer-substring-no-properties
-                          (line-beginning-position)
-                          (point))))
-           (forward-char)
-           (if (re-search-forward indent (line-end-position 2) t)
-               (progn
-                 (while (and
-                         (< (point) (point-max))
-                         (= (point) (line-end-position)))
-                   (forward-char))
-                 (lispy--mark (cons (point) (line-end-position))))
-             (lispy--mark (cons beg end)))
-           (when leftp
-             (exchange-point-and-mark))))
-        ((region-active-p)
-         (if (lpy-listp)
-             (cond ((lpy-arg-rightp)
-                    (unless (eq (point) (1- (cdr lpy-listp-last)))
-                      (lpy-slurp)
-                      (exchange-point-and-mark)
-                      (lpy-barf)
-                      (exchange-point-and-mark)))
-                   ((lpy-arg-leftp)
-                    (exchange-point-and-mark)
-                    (if (eq (point) (1- (cdr lpy-listp-last)))
+  (lispy-dotimes arg
+    (cond ((lpy-line-p)
+           (let ((beg (region-beginning))
+                 (end (region-end))
+                 (leftp (= (point) (region-beginning)))
+                 indent)
+             (goto-char beg)
+             (setq indent (concat
+                           "^"
+                           (buffer-substring-no-properties
+                            (line-beginning-position)
+                            (point))))
+             (forward-char)
+             (if (re-search-forward indent (line-end-position 2) t)
+                 (progn
+                   (while (and
+                           (< (point) (point-max))
+                           (= (point) (line-end-position)))
+                     (forward-char))
+                   (lispy--mark (cons (point) (line-end-position))))
+               (lispy--mark (cons beg end)))
+             (when leftp
+               (exchange-point-and-mark))))
+          ((region-active-p)
+           (if (lpy-listp)
+               (cond ((lpy-arg-rightp)
+                      (unless (eq (point) (1- (cdr lpy-listp-last)))
+                        (lpy-slurp)
                         (exchange-point-and-mark)
-                      (lpy-slurp)
+                        (lpy-barf)
+                        (exchange-point-and-mark)))
+                     ((lpy-arg-leftp)
                       (exchange-point-and-mark)
-                      (lpy-barf)))
-                   (t
-                    nil))
+                      (if (eq (point) (1- (cdr lpy-listp-last)))
+                          (exchange-point-and-mark)
+                        (lpy-slurp)
+                        (exchange-point-and-mark)
+                        (lpy-barf)))
+                     (t
+                      nil))
 
-           (lispy-down arg)))
-        ((looking-at outline-regexp)
-         (zo-down arg))
-        ((lpy-line-left-p)
-         (when (looking-at " ")
-           (forward-char 1))
-         (let (bnd)
-           (if (setq bnd (lispy--bounds-comment))
-               (progn
-                 (goto-char (cdr bnd))
-                 (back-to-indentation)))
-           (let* ((offset (current-column))
-                  (bound (if (= offset 0)
+             (lispy-down arg)))
+          ((looking-at outline-regexp)
+           (zo-down arg))
+          ((lpy-line-left-p)
+           (when (looking-at " ")
+             (forward-char 1))
+           (let (bnd)
+             (if (setq bnd (lispy--bounds-comment))
+                 (progn
+                   (goto-char (cdr bnd))
+                   (back-to-indentation)))
+             (let* ((offset (current-column))
+                    (bound (if (= offset 0)
+                               (save-excursion
+                                 (or (outline-next-heading)
+                                     (point-max)))
                              (save-excursion
-                               (or (outline-next-heading)
-                                   (point-max)))
-                           (save-excursion
-                             (or
-                              (let ((match-found nil))
-                                (while (and (re-search-forward
-                                             (format "^%s[^ \n]" (make-string (- offset 4) 32))
-                                             nil t)
-                                            (setq match-found t)
-                                            (lispy--in-string-or-comment-p)))
-                                (if match-found
-                                    (point)))
-                              (point-max)))))
-                  (regex (format "^%s[^ \n]" (buffer-substring-no-properties
-                                              (line-beginning-position) (point))))
-                  (old-point (point))
-                  bnd)
-             (forward-char 1)
-             (unless (catch 'done
-                       (while (re-search-forward regex bound t)
-                         (goto-char (1- (match-end 0)))
-                         (if (setq bnd (lpy-multiline-string-bnd))
-                             (goto-char (cdr bnd))
-                           (throw 'done t))))
-               (goto-char old-point))
-             (unless (bolp)
-               (backward-char 1)))))))
+                               (or
+                                (let ((match-found nil))
+                                  (while (and (re-search-forward
+                                               (format "^%s[^ \n]" (make-string (- offset 4) 32))
+                                               nil t)
+                                              (setq match-found t)
+                                              (lispy--in-string-or-comment-p)))
+                                  (if match-found
+                                      (point)))
+                                (point-max)))))
+                    (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                                                (line-beginning-position) (point))))
+                    (old-point (point))
+                    bnd)
+               (forward-char 1)
+               (unless (catch 'done
+                         (while (re-search-forward regex bound t)
+                           (goto-char (1- (match-end 0)))
+                           (if (setq bnd (lpy-multiline-string-bnd))
+                               (goto-char (cdr bnd))
+                             (throw 'done t))))
+                 (goto-char old-point))
+               (unless (bolp)
+                 (backward-char 1))))))))
 
 (defun lpy-bounds-defun ()
   (save-excursion
@@ -555,79 +556,80 @@
   "Move up ARG times inside the current sexp."
   (interactive "p")
   (lispy--remember)
-  (cond ((lpy-line-p)
-         (let ((beg (region-beginning))
-               (end (region-end))
-               (leftp (= (point) (region-beginning)))
-               indent)
-           (unless (= beg (point-min))
-             (goto-char beg)
-             (setq indent (concat
-                           "^"
-                           (buffer-substring-no-properties
-                            (line-beginning-position)
-                            (point))))
-             (backward-char)
-             (if (re-search-backward indent (lpy-bof-position) t)
-                 (progn
-                   (goto-char (match-end 0))
-                   (while (and
-                           (> (point) (point-min))
-                           (= (point) (line-end-position)))
-                     (forward-line -1))
-                   (lispy--mark (cons (point) (line-end-position))))
-               (lispy--mark (cons beg end)))
-             (when leftp
-               (exchange-point-and-mark)))))
-        ((lpy-outline-p)
-         (zo-up arg)
-         (unless (= 0 (skip-chars-forward " "))
-           (backward-char)))
-        ((region-active-p)
-         (if (lpy-listp)
-             (cond ((lpy-arg-rightp)
-                    (exchange-point-and-mark)
-                    (if (= (point) (1+ (car lpy-listp-last)))
+  (lispy-dotimes arg
+    (cond ((lpy-line-p)
+           (let ((beg (region-beginning))
+                 (end (region-end))
+                 (leftp (= (point) (region-beginning)))
+                 indent)
+             (unless (= beg (point-min))
+               (goto-char beg)
+               (setq indent (concat
+                             "^"
+                             (buffer-substring-no-properties
+                              (line-beginning-position)
+                              (point))))
+               (backward-char)
+               (if (re-search-backward indent (lpy-bof-position) t)
+                   (progn
+                     (goto-char (match-end 0))
+                     (while (and
+                             (> (point) (point-min))
+                             (= (point) (line-end-position)))
+                       (forward-line -1))
+                     (lispy--mark (cons (point) (line-end-position))))
+                 (lispy--mark (cons beg end)))
+               (when leftp
+                 (exchange-point-and-mark)))))
+          ((lpy-outline-p)
+           (zo-up arg)
+           (unless (= 0 (skip-chars-forward " "))
+             (backward-char)))
+          ((region-active-p)
+           (if (lpy-listp)
+               (cond ((lpy-arg-rightp)
+                      (exchange-point-and-mark)
+                      (if (= (point) (1+ (car lpy-listp-last)))
+                          (exchange-point-and-mark)
+                        (lpy-slurp)
                         (exchange-point-and-mark)
+                        (lpy-barf)))
+                     ((lpy-arg-leftp)
                       (lpy-slurp)
                       (exchange-point-and-mark)
                       (lpy-barf)))
-                   ((lpy-arg-leftp)
-                    (lpy-slurp)
-                    (exchange-point-and-mark)
-                    (lpy-barf)))
 
-           (lispy-up arg)))
-        ((lpy-line-left-p)
-         (when (looking-at " ")
-           (forward-char 1))
-         (let* ((offset (current-column))
-                (bound (if (= offset 0)
-                           (condition-case nil
-                               (save-excursion
-                                 (lpy-back-to-outline)
-                                 (1+ (point)))
-                             (error (point-min)))
-                         (save-excursion
-                           (while (and (re-search-backward
-                                        (format "^%s[^ \n]" (make-string (- offset 4) 32)))
-                                       (lispy--in-string-or-comment-p)))
-                           (point))))
-                (regex (format "^%s[^ \n]" (buffer-substring-no-properties
-                                            (line-beginning-position) (point))))
-                bnd)
-           (catch 'done
-             (while (re-search-backward regex bound t)
-               (goto-char (- (match-end 0) 1))
-               ;; triple quoted strings
-               (if (setq bnd (lpy-multiline-string-bnd))
-                   (goto-char (car bnd))
-                 (throw 'done t))))
-           (let (bnd)
-             (when (setq bnd (lispy--bounds-comment))
-               (goto-char (car bnd))))
-           (unless (bolp)
-             (backward-char 1))))))
+             (lispy-up arg)))
+          ((lpy-line-left-p)
+           (when (looking-at " ")
+             (forward-char 1))
+           (let* ((offset (current-column))
+                  (bound (if (= offset 0)
+                             (condition-case nil
+                                 (save-excursion
+                                   (lpy-back-to-outline)
+                                   (1+ (point)))
+                               (error (point-min)))
+                           (save-excursion
+                             (while (and (re-search-backward
+                                          (format "^%s[^ \n]" (make-string (- offset 4) 32)))
+                                         (lispy--in-string-or-comment-p)))
+                             (point))))
+                  (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                                              (line-beginning-position) (point))))
+                  bnd)
+             (catch 'done
+               (while (re-search-backward regex bound t)
+                 (goto-char (- (match-end 0) 1))
+                 ;; triple quoted strings
+                 (if (setq bnd (lpy-multiline-string-bnd))
+                     (goto-char (car bnd))
+                   (throw 'done t))))
+             (let (bnd)
+               (when (setq bnd (lispy--bounds-comment))
+                 (goto-char (car bnd))))
+             (unless (bolp)
+               (backward-char 1)))))))
 
 (defun lpy-flow ()
   (interactive)
