@@ -527,6 +527,21 @@
                 (lispy--in-string-or-comment-p))))
        'at-full))))
 
+(defun lpy-avy ()
+  (interactive)
+  (lispy--remember)
+  (deactivate-mark)
+  (let ((avy-keys lispy-avy-keys)
+        (bnd (bounds-of-thing-at-point 'defun)))
+    (avy-with lpy-avy
+      (lispy--avy-do
+       "^ *\\( \\)"
+       bnd
+       (lambda () (not (lispy--in-string-or-comment-p)))
+       'at 1))
+    (back-to-indentation)
+    (backward-char)))
+
 (defun lpy-add-outline ()
   (let ((bnd (zo-bnd-subtree))
         (lvl (lispy-outline-level))
@@ -1385,7 +1400,7 @@ When ARG is 2, jump to tags in current dir."
     (lpy-define-key map "n" 'lispy-new-copy)
     (lpy-define-key map "o" 'lpy-open)
     (lpy-define-key map "p" 'self-insert-command)
-    (lpy-define-key map "q" 'self-insert-command)
+    (lpy-define-key map "q" 'lpy-avy)
     (lpy-define-key map "r" 'self-insert-command)
     (lpy-define-key map "s" 'self-insert-command)
     (lpy-define-key map "t" 'lpy-teleport)
