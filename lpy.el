@@ -1,12 +1,12 @@
 ;;; lpy.el --- A lispy interface to Python -*- lexical-binding: t -*-
 
-;; Copyright (C) 2016 Oleh Krehel
+;; Copyright (C) 2016-2020 Oleh Krehel
 
 ;; Author: Oleh Krehel <ohwoeowho@gmail.com>
 ;; URL: https://github.com/abo-abo/lpy
 ;; Version: 0.1.0
 ;; Keywords: python, lisp
-;; Package-Requires: ((zoutline "0.1.0") (lispy "0.26.0"))
+;; Package-Requires: ((lispy "0.27.0"))
 
 ;; This file is not part of GNU Emacs
 
