@@ -1,6 +1,12 @@
 ;;; soap.el --- Smart Operator a posteriori
 
-;; Copyright (C) 2015-2019 Oleh Krehel
+;; Copyright (C) 2015-2020 Oleh Krehel
+
+;; Author: Oleh Krehel <ohwoeowho@gmail.com>
+;; URL: https://github.com/abo-abo/lpy
+;; Version: 0.1.0
+;; Keywords: convenience
+;; Package-Requires: ((emacs "25.1"))
 
 ;; This file is not part of GNU Emacs.
 

@@ -6,7 +6,7 @@
 ;; URL: https://github.com/abo-abo/lpy
 ;; Version: 0.1.0
 ;; Keywords: python, lisp
-;; Package-Requires: ((lispy "0.27.0"))
+;; Package-Requires: ((emacs "25.1") (lispy "0.27.0"))
 
 ;; This file is not part of GNU Emacs
 
@@ -1446,3 +1446,5 @@ When ARG is 2, jump to tags in current dir."
     (setq-local forward-sexp-function nil)))
 
 (provide 'lpy)
+
+;;; lpy.el ends here
