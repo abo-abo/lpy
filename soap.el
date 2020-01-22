@@ -65,27 +65,6 @@
   (unless (eq (char-after) ?\ )
     (insert " ")))
 
-(defun soap-op-> ()
-  (interactive)
-  (cond ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)")
-         (delete-region (match-beginning 1)
-                        (match-end 1))
-         (insert "->"))
-        ((eq major-mode 'sml-mode)
-         (cond ((looking-back ":")
-                (insert "> "))
-               ((looking-back "- ")
-                (delete-char -1)
-                (insert "> "))
-               (t
-                (soap-default-action ">"))))
-        ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)")
-         (delete-region (match-beginning 1)
-                        (match-end 1))
-         (insert "->"))
-        (t
-         (soap-default-action ">"))))
-
 (defun soap-after-string-p (str)
   "Return t if the string before point is STR."
   (string=
@@ -95,6 +74,27 @@
      (point-min))
     (point))
    str))
+
+(defun soap-op-> ()
+  (interactive)
+  (cond ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)" (line-beginning-position))
+         (delete-region (match-beginning 1)
+                        (match-end 1))
+         (insert "->"))
+        ((eq major-mode 'sml-mode)
+         (cond ((soap-after-string-p ":")
+                (insert "> "))
+               ((soap-after-string-p "- ")
+                (delete-char -1)
+                (insert "> "))
+               (t
+                (soap-default-action ">"))))
+        ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)" (line-beginning-position))
+         (delete-region (match-beginning 1)
+                        (match-end 1))
+         (insert "->"))
+        (t
+         (soap-default-action ">"))))
 
 (defun soap-command (&optional arg)
   "Similar to `self-insert-command', except handles whitespace."
@@ -110,27 +110,27 @@
 
           ((string= op "+")
            (cond
-             ((looking-back " ?\\+ ")
+             ((looking-back " ?\\+ " (line-beginning-position))
               (if (eq major-mode 'haskell-mode)
                   (progn
                     (backward-delete-char 1)
                     (insert "+ "))
                 (backward-delete-char 3)
                 (insert "++")))
-             ((looking-back "\\s-\\|=\\|\\+\\|\\([0-9.]+e\\)")
+             ((looking-back "\\s-\\|=\\|\\+\\|\\([0-9.]+e\\)" (line-beginning-position))
               (insert "+"))
              (t (soap-default-action op))))
 
           ((string= op "-")
            (cond
-             ((looking-back " \\- ")
+             ((soap-after-string-p " - ")
               (backward-delete-char 3)
               (insert "--"))
              ((or (looking-at "[\\s-]*>") (bolp))
               (insert op))
-             ((looking-back "\\s-\\|=\\|-\\|this\\|(\\|\\([0-9.]+e\\)")
+             ((looking-back "\\s-\\|=\\|-\\|this\\|(\\|\\([0-9.]+e\\)" (line-beginning-position))
               (insert op))
-             ((looking-back "[:[]")
+             ((looking-back "[:[]" (line-beginning-position))
               (insert op))
              (t (soap-default-action op))))
 
@@ -138,10 +138,10 @@
            (cond ((soap-after-string-p " * ")
                   (delete-char -3)
                   (insert "**"))
-                 ((or (looking-back "(\\|[\t :.]+")
+                 ((or (looking-back "(\\|[\t :.]+" (line-beginning-position))
                       (looking-at ">")
-                      (looking-back "^\\sw+")
-                      (looking-back "char\\|int\\|double\\|void"))
+                      (looking-back "^\\sw+" (line-beginning-position))
+                      (looking-back "char\\|int\\|double\\|void" (line-beginning-position)))
                   (insert op))
                  ((memq major-mode '(java-mode))
                   (insert op))
@@ -150,21 +150,21 @@
                   (soap-default-action op))))
 
           ((string= op "/")
-           (cond ((or (looking-back "\\.")
-                      (looking-back "^#.*"))
+           (cond ((or (soap-after-string-p ".")
+                      (looking-back "^#.*" (line-beginning-position)))
                   (insert op))
-                 ((and (looking-back "^ *")
+                 ((and (looking-back "^ *" (line-beginning-position))
                        (memq major-mode '(c++-mode c-mode)))
                   (insert "// "))
                  (t
                   (soap-default-action op))))
 
           ((and (string= op "%")
-                (looking-back "[ \t]+"))
+                (looking-back "[ \t]+" (line-beginning-position)))
            (insert op))
 
           ((string= op "&")
-           (cond ((looking-back "&")
+           (cond ((soap-after-string-p "&")
                   (backward-delete-char 1)
                   (insert " && "))
                  (t
@@ -172,7 +172,7 @@
 
           ((string= op ",")
            (if (and (looking-at "[^\n<]*>")
-                    (looking-back "<[^\n>]+"))
+                    (looking-back "<[^\n>]+" (line-beginning-position)))
                (insert op)
              (insert ", ")))
 
@@ -188,21 +188,21 @@
           ((string= op "=")
            (cond
              ((and (eq major-mode 'python-mode)
-                   (looking-back "[,(][\n ]*\\(\\sw\\|\\s_\\)+"))
+                   (looking-back "[,(][\n ]*\\(\\sw\\|\\s_\\)+" (line-beginning-position -1)))
               ;; keyword argument in Python
               (insert "="))
-             ((looking-back "!" (line-beginning-position))
+             ((soap-after-string-p "!")
               (backward-delete-char 1)
               (just-one-space)
               (insert "!= "))
-             ((looking-back "<")
+             ((soap-after-string-p "<")
               (delete-char -1)
               (insert " <= "))
-             ((looking-back "\\sw\\( ?\\+ ?\\)")
+             ((looking-back "\\sw\\( ?\\+ ?\\)" (line-beginning-position))
               (delete-region (match-beginning 1)
                              (match-end 1))
               (insert " += "))
-             ((looking-back "\\[")
+             ((soap-after-string-p "[")
               (insert op))
              (t
               (soap-default-action op))))
