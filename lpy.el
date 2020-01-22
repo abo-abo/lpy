@@ -57,7 +57,6 @@
 (require 'lispy)
 (require 'le-python)
 (require 'soap)
-(require 'jedi nil t)
 (require 'flyspell nil t)
 (require 'zoutline)
 
@@ -65,7 +64,6 @@
   "List navigation and editing for Python."
   :group 'bindings
   :prefix "lpy-")
-(require 'org)
 
 (defconst lpy-font-lock-keywords
   '(("^# ?\\(\\*\\|\\*[^*\n].*\\)$" 1 'org-level-1 prepend)
