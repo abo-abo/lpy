@@ -180,6 +180,7 @@ Use this to detect a space elsewhere."
     (user-error "Not on an outline")))
 
 (defun lpy-tab ()
+  "Fold or unfold the current outline."
   (interactive)
   (cond ((or (lispy--in-comment-p)
              (looking-at lispy-outline))
@@ -215,11 +216,7 @@ Use this to detect a space elsewhere."
              (indent-to col)
              (backward-delete-char (- (current-column) col))
              (move-beginning-of-line 2))
-           (goto-char beg)))
-        (t
-         ;; (let ((forward-sexp-function nil))
-         ;;   (indent-sexp))
-         )))
+           (goto-char beg)))))
 
 (defun lpy-contents ()
   "Toggle contents for the current outline."
@@ -231,6 +228,7 @@ Use this to detect a space elsewhere."
       (outline-hide-body))))
 
 (defun lpy--insert-or-call (def)
+  "Return a command to either self-insert or call DEF."
   `(lambda ()
      ,(format "Call `%s' when special, self-insert otherwise.\n\n%s"
               (symbol-name def) (documentation def))
@@ -259,7 +257,7 @@ Use this to detect a space elsewhere."
              'self-insert-command)))))
 
 (defun lpy-define-key (keymap key def)
-  "Forward to (`define-key' KEYMAP KEY FUNC)."
+  "Forward to (`define-key' KEYMAP KEY DEF)."
   (declare (indent 3))
   (let ((func (defalias (intern (concat "pspecial-" (symbol-name def)))
                   (lpy--insert-or-call def))))
@@ -271,6 +269,7 @@ Use this to detect a space elsewhere."
     (define-key keymap (kbd key) func)))
 
 (defun lpy-line-p ()
+  "Return t when a line is selected with a region."
   (and (region-active-p)
        (= (region-end) (line-end-position))
        (save-excursion
@@ -280,6 +279,7 @@ Use this to detect a space elsewhere."
 (defvar lpy-listp-last nil)
 
 (defun lpy-listp ()
+  "When on a list, return its bounds as a cons."
   (ignore-errors
     (unless (or (memq last-command '(python-indent-dedent-line-backspace
                                      lpy-parens
@@ -303,6 +303,7 @@ Use this to detect a space elsewhere."
                  end)))))))
 
 (defun lpy-arg-leftp ()
+  "Test if on the left side of arg."
   (or (eq (point) (1+ (car lpy-listp-last)))
       (and (looking-at " ")
            (looking-back
@@ -310,54 +311,16 @@ Use this to detect a space elsewhere."
             (- (line-beginning-position) 2)))))
 
 (defun lpy-arg-rightp ()
+  "Test if on the right of arg."
   (or (and (eq (point) (1- (cdr lpy-listp-last)))
            (not (lispy-after-string-p " ")))
       (looking-at ",")))
 
 (defun lpy-arg-forward ()
+  "Forward by arg."
   (while (and (< (point) (point-max))
               (not (looking-at ",")))
     (forward-sexp 1)))
-
-(defun lpy-forward-sexp-function (arg)
-  (let* ((forward-sexp-function nil)
-         (bnd
-          (let ((forward-sexp-function nil))
-            (lpy-listp))))
-    ;; inside function arglist
-    (cond (bnd
-           (save-restriction
-             (narrow-to-region (1+ (car bnd))
-                               (1- (cdr bnd)))
-             (if (> arg 0)
-                 (lispy-dotimes arg
-                   (cond ((= (point) (point-min))
-                          (lpy-arg-forward))
-                         ((or (lpy-arg-rightp)
-                              (lpy-arg-leftp))
-                          (forward-char 1)
-                          (lpy-arg-forward))
-                         (t
-                          (forward-sexp arg))))
-               (lispy-dotimes (- arg)
-                 (if (or (= (point) (point-max))
-                         (or (lpy-arg-rightp)
-                             (lpy-arg-leftp)))
-                     (progn
-                       (forward-sexp -1)
-                       (skip-chars-backward ", \n")
-                       (while (and (> (point) (point-min))
-                                   (not (looking-at ",")))
-                         (forward-sexp -1)
-                         (skip-chars-backward ", \n"))
-                       (skip-chars-forward ", \n")
-                       (unless (bobp)
-                         (backward-char)))
-                   (backward-sexp))))))
-          ((looking-at " +\\*")
-           (goto-char (match-end 0)))
-          (t
-           (forward-sexp arg)))))
 
 (defun lpy-bof-position ()
   (save-excursion
@@ -1450,10 +1413,8 @@ When ARG is 2, jump to tags in current dir."
         (setq-local fill-forward-paragraph-function 'lpy-fill-forward-paragraph-function)
         (setq-local completion-at-point-functions '(lispy-python-completion-at-point t))
         (setq-local lispy-no-space t)
-        ;; (setq-local forward-sexp-function 'lpy-forward-sexp-function)
         (font-lock-add-keywords major-mode lpy-font-lock-keywords))
-    (font-lock-remove-keywords major-mode lpy-font-lock-keywords)
-    (setq-local forward-sexp-function nil)))
+    (font-lock-remove-keywords major-mode lpy-font-lock-keywords)))
 
 (provide 'lpy)
 
