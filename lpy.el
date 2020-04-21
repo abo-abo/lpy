@@ -78,6 +78,8 @@
     ("`\\([^\n']+\\)'" 1 font-lock-constant-face prepend)))
 
 (defun lpy-fill-forward-paragraph-function (&optional arg)
+  "The setting for `fill-forward-paragraph-function'.
+The argument ARG is passed to `forward-paragraph'."
   (let (bnd)
     (if (and (setq bnd (lispy--bounds-string))
              (string-match "\\`\"\"\"" (lispy--string-dwim bnd)))
@@ -85,6 +87,7 @@
       (forward-paragraph arg))))
 
 (defun lpy-fill-paragraph (&optional _justify)
+  "The setting for `fill-paragraph-function'."
   (interactive)
   (let (bnd)
     (cond ((setq bnd (lispy--bounds-comment))
@@ -113,6 +116,7 @@
              (fill-paragraph))))))
 
 (defun lpy-outline-comment-highlight (limit)
+  "Highlight outline comment up to LIMIT."
   (catch 'done
     (while (re-search-forward "^#\\(?:[^*\n]\\)" limit t)
       (let* ((pt (point))
@@ -126,21 +130,27 @@
           (throw 'done t))))))
 
 (defun lpy-left-p ()
+  "Return t if before `lispy-left'."
   (looking-at lispy-left))
 
 (defun lpy-right-p ()
+  "Return t if after `lispy-right'."
   (looking-back lispy-right
                 (line-beginning-position)))
 
 (defun lpy-outline-p ()
+  "Return t when before `outline-regexp'."
   (and (looking-at outline-regexp)
        (looking-at lispy-outline-header)))
 
 (defun lpy-space (arg)
+  "Forward to `self-insert-command' ARG.
+Use this to detect a space elsewhere."
   (interactive "p")
   (self-insert-command arg))
 
 (defun lpy-line-left-p ()
+  "Return t when in special position in Python."
   (or (and (bolp)
            (not (or
                  (eolp)
@@ -151,25 +161,23 @@
            (looking-back "^ +" (line-beginning-position))
            (not (= (mod (current-column) 4) 0)))))
 
-(defun lpy-line-right-p ()
-  (or ;; (eolp)
-   (looking-at "#+$")))
-
 (defun lpy-outline-add ()
+  "Insert an outline below the current one."
   (interactive)
-  (when (looking-at lispy-outline)
-    (let ((lvl (lispy-outline-level)))
-      (condition-case nil
-          (outline-forward-same-level 1)
-        (error (goto-char (point-max))))
-      (while (eq (char-before) ?\n)
-        (delete-char -1))
-      (insert
-       "\n\n"
-       lispy-outline-header
-       (make-string lvl ?\*)
-       " \n")
-      (beginning-of-line 0))))
+  (if (looking-at lispy-outline)
+      (let ((lvl (lispy-outline-level)))
+        (condition-case nil
+            (outline-forward-same-level 1)
+          (error (goto-char (point-max))))
+        (while (eq (char-before) ?\n)
+          (delete-char -1))
+        (insert
+         "\n\n"
+         lispy-outline-header
+         (make-string lvl ?\*)
+         " \n")
+        (beginning-of-line 0))
+    (user-error "Not on an outline")))
 
 (defun lpy-tab ()
   (interactive)

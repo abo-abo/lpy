@@ -1,5 +1,5 @@
 #* Imports
-from pycook.recipes.emacs import byte_compile
+from pycook.recipes.emacs import byte_compile, checkdoc
 import pycook.insta as st
 
 #* Recipes

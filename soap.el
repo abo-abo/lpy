@@ -82,6 +82,7 @@
    str))
 
 (defun soap-op-> ()
+  "Action for >."
   (interactive)
   (cond ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)" (line-beginning-position))
          (delete-region (match-beginning 1)
@@ -103,7 +104,7 @@
          (soap-default-action ">"))))
 
 (defun soap-command (&optional arg)
-  "Similar to `self-insert-command', except handles whitespace."
+  "Similar to `self-insert-command' with ARG, except handles whitespace."
   (interactive "p")
   (setq arg (or arg 1))
   (let ((op (this-command-keys)))
