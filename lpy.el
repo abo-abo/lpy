@@ -908,25 +908,6 @@ Call this twice to go back."
           " ")
   (end-of-line))
 
-(defun lpy-backward ()
-  (interactive)
-  (lispy--remember)
-  (if (looking-back "^ *" (line-beginning-position))
-      (let ((pt (point)))
-        (when (= (char-after) 32)
-          (forward-char))
-        (python-nav-backward-up-list)
-        (cond ((/= pt (point))
-               (when (looking-back "^ +" (line-beginning-position))
-                 (backward-char 1)))
-              ((bolp)
-               (outline-back-to-heading)
-               nil)
-              (t
-               (python-nav-beginning-of-statement))))
-    (back-to-indentation)
-    (backward-char 1)))
-
 (defun lpy-clean ()
   (interactive)
   (save-excursion
