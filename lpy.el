@@ -791,9 +791,12 @@ When on an outline, add an outline below."
          (insert "()")
          (backward-char))))
 
-(defvar lpy-back-to-outline nil)
+(defvar lpy-back-to-outline nil
+  "Store the point for 'lpy-back-to-outline.")
 
 (defun lpy-back-to-outline ()
+  "Go to the current outline start.
+Call this twice to go back."
   (interactive)
   (if (and (memq last-command '(lpy-back-to-outline))
            (looking-at lispy-outline))
@@ -802,6 +805,7 @@ When on an outline, add an outline below."
     (outline-back-to-heading)))
 
 (defun lpy-back-to-special ()
+  "Go back to special."
   (interactive)
   (if (lispy-bolp)
       (lispy-pam-restore 'lpy-back-to-special)
@@ -814,6 +818,7 @@ When on an outline, add an outline below."
       (backward-char))))
 
 (defun lpy-mark ()
+  "Mark the current thing."
   (interactive)
   (lispy--remember)
   (let (bnd)
@@ -841,6 +846,7 @@ When on an outline, add an outline below."
            (lispy-mark)))))
 
 (defun lpy-slurp ()
+  "Slurp in an item into the region."
   (cond ((and (region-active-p)
               (lpy-listp))
          (cond ((lpy-arg-rightp)
@@ -853,6 +859,7 @@ When on an outline, add an outline below."
          (soap-command))))
 
 (defun lpy-barf ()
+  "Barf out an item from the region."
   (cond ((and (region-active-p)
               (lpy-listp))
          (cond ((lpy-arg-rightp)
@@ -874,6 +881,7 @@ When on an outline, add an outline below."
          (soap-command))))
 
 (defun lpy-open ()
+  "Insert a newline after the current marked line."
   (interactive)
   (when (and (region-active-p)
              (eq (line-number-at-pos (region-beginning))
@@ -883,6 +891,7 @@ When on an outline, add an outline below."
     (newline-and-indent)))
 
 (defun lpy-teleport ()
+  "Go to the end of the current outline."
   (interactive)
   (if (looking-at lispy-outline)
       (end-of-line)
