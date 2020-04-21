@@ -918,22 +918,6 @@ Call this twice to go back."
         (delete-region (1- (line-beginning-position)) (point))))
     (save-buffer)))
 
-(defun lpy-insert-prev-outline ()
-  (interactive)
-  (if (looking-back "^#.*\n" (line-beginning-position 0))
-      (save-excursion
-        (insert
-         (save-excursion
-           (zo-up 1)
-           (goto-char (1+ (cdr (lispy--bounds-comment))))
-           (let ((beg (point))
-                 (bnd (zo-bnd-subtree)))
-             (while (and (< (point) (cdr bnd))
-                         (not (lispy--in-comment-p)))
-               (forward-line 1))
-             (buffer-substring-no-properties beg (1- (point)))))))
-    (avy-pop-mark)))
-
 (defun lpy-view ()
   (interactive)
   (let ((window-line (count-lines (window-start) (point))))
