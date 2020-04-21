@@ -323,12 +323,14 @@ Use this to detect a space elsewhere."
     (forward-sexp 1)))
 
 (defun lpy-bof-position ()
+  "Return the start of the current function."
   (save-excursion
     (if (beginning-of-defun)
         (point)
       (line-beginning-position))))
 
 (defun lpy-next-top-level-sexp ()
+  "Go to next top level sexp."
   (let* ((outline-regexp "# ?\\*+")
          (end (lispy--outline-end)))
     (forward-char 1)
@@ -338,6 +340,7 @@ Use this to detect a space elsewhere."
     (forward-char -1)))
 
 (defun lpy-prev-top-level-sexp ()
+  "Go to previous top level sexp."
   (let* ((outline-regexp "# ?\\*+")
          (beg (lispy--outline-beg)))
     (unless (eq beg 1)
@@ -364,6 +367,7 @@ Use this to detect a space elsewhere."
   ("c" nil "quit"))
 
 (defun lpy-outline-edit-below ()
+  "Edit the current outline below."
   (interactive)
   (beginning-of-line)
   (forward-line 1)
@@ -371,6 +375,7 @@ Use this to detect a space elsewhere."
     (newline)))
 
 (defun lpy-multiline-string-bnd ()
+  "Return the bounds of the current triple quoted string."
   (let (bnd)
     (and (setq bnd (lispy--bounds-string))
          (> (count-lines (car bnd) (cdr bnd)) 1)
@@ -464,6 +469,7 @@ Use this to detect a space elsewhere."
                  (backward-char 1))))))))
 
 (defun lpy-bounds-defun ()
+  "Return the bounds of the current defun."
   (save-excursion
     (let (beg)
       (unless (looking-at "^")
@@ -472,8 +478,9 @@ Use this to detect a space elsewhere."
       (end-of-defun)
       (cons beg (point)))))
 
-(defun lpy-avy-symbol-action (x)
-  (goto-char x)
+(defun lpy-avy-symbol-action (pt)
+  "Mark the symbol at PT."
+  (goto-char pt)
   (cond ((looking-at "^"))
         ((looking-back "^ +" (line-beginning-position))
          (backward-char))
@@ -481,6 +488,8 @@ Use this to detect a space elsewhere."
          (lpy-mark-symbol))))
 
 (defun lpy-avy-symbol ()
+  "Select a symbol with avy and mark it.
+When on an outline, add an outline below."
   (interactive)
   (if (looking-at lispy-outline)
       (lpy-add-outline)
@@ -499,6 +508,7 @@ Use this to detect a space elsewhere."
        'at-full))))
 
 (defun lpy-avy ()
+  "Select a line in the current function with avy."
   (interactive)
   (lispy--remember)
   (deactivate-mark)
@@ -514,6 +524,7 @@ Use this to detect a space elsewhere."
     (backward-char)))
 
 (defun lpy-add-outline ()
+  "Add an outline below the current one."
   (let ((bnd (zo-bnd-subtree))
         (lvl (lispy-outline-level))
         (outline
@@ -618,6 +629,7 @@ Use this to detect a space elsewhere."
                (backward-char 1)))))))
 
 (defun lpy-flow ()
+  "Navigate to the next child item."
   (interactive)
   (cond ((looking-at lispy-outline)
          (lpy-next-top-level-sexp))
@@ -632,6 +644,7 @@ Use this to detect a space elsewhere."
          (self-insert-command 1))))
 
 (defun lpy-left (arg)
+  "Go left ARG times."
   (interactive "p")
   (lispy--remember)
   (cond ((lpy-outline-p)
@@ -654,12 +667,8 @@ Use this to detect a space elsewhere."
         (t
          (self-insert-command 1))))
 
-(defun lpy-lvl ()
-  (save-excursion
-    (back-to-indentation)
-    (- (point) (line-beginning-position))))
-
 (defun lpy-right (_arg)
+  "Go right."
   (interactive "p")
   (lispy--remember)
   (cond ((lpy-outline-p)
@@ -709,6 +718,7 @@ Use this to detect a space elsewhere."
          (user-error "Unexpected"))))
 
 (defun lpy-mark-symbol ()
+  "Mark the current symbol."
   (interactive)
   (lispy--remember)
   (let (bnd)
