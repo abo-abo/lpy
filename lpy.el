@@ -755,11 +755,13 @@ When on an outline, add an outline below."
   "When non-nil, don't insert a space before parens.")
 
 (defun lpy-just-one-space ()
+  "Make sure there is just one space around the point."
   (unless lpy-no-space
     (just-one-space)))
 
 (defun lpy-parens (&optional arg)
-  "Insert a pair of parens."
+  "Insert a pair of parens.
+When ARG is non-nil, wrap the current item with parens."
   (interactive "P")
   (cond ((region-active-p)
          (lispy--surround-region
@@ -909,6 +911,7 @@ Call this twice to go back."
   (end-of-line))
 
 (defun lpy-clean ()
+  "Clean up the evaluation results in the current buffer."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -919,6 +922,7 @@ Call this twice to go back."
     (save-buffer)))
 
 (defun lpy-view ()
+  "Recenter the buffer around the current point."
   (interactive)
   (let ((window-line (count-lines (window-start) (point))))
     (if (or (= window-line 0)
@@ -980,6 +984,7 @@ When ARG is 2, jump to tags in current dir."
       (backward-char 1))))
 
 (defun lpy-tag-name (tag)
+  "Return a pretty name for TAG."
   (let* ((class (semantic-tag-class tag))
          (str (cl-case class
                 (function
@@ -1052,6 +1057,7 @@ When ARG is 2, jump to tags in current dir."
     (replace-match " (" t t nil 1)))
 
 (defun lpy-quotes ()
+  "Insert quotes."
   (interactive)
   (let (bnd)
     (cond ((region-active-p)
@@ -1091,6 +1097,7 @@ When ARG is 2, jump to tags in current dir."
            (backward-char)))))
 
 (defun lpy-split ()
+  "Split the current string or comment."
   (interactive)
   (let ((bnd (lispy--bounds-string)))
     (if bnd
@@ -1098,10 +1105,11 @@ When ARG is 2, jump to tags in current dir."
           (when (looking-back " +" (line-beginning-position))
             (delete-region (match-beginning 0) (match-end 0)))
           (insert quote-str "\n" quote-str)
-        (indent-for-tab-command))
+          (indent-for-tab-command))
       (indent-new-comment-line))))
 
 (defun lpy-beginning-of-line ()
+  "Go back to indentation or to the beginning of line."
   (interactive)
   (if (and (looking-at " ")
            (looking-back " +" (line-beginning-position)))
@@ -1111,6 +1119,7 @@ When ARG is 2, jump to tags in current dir."
       (backward-char))))
 
 (defun lpy-kill-line ()
+  "Kill the current line."
   (interactive)
   (let (bnd)
     (cond
@@ -1135,6 +1144,7 @@ When ARG is 2, jump to tags in current dir."
        (kill-line)))))
 
 (defun lpy-delete ()
+  "Delete the current item."
   (interactive)
   (cond
     ((region-active-p)
