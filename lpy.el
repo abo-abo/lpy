@@ -1215,6 +1215,7 @@ When ARG is 2, jump to tags in current dir."
                0))))))
 
 (defun lpy-occur-action (x)
+  "Goto X."
   (goto-char lispy--occur-beg)
   (forward-line (read x))
   (when (re-search-forward (ivy--regex ivy-text) (line-end-position) t)
@@ -1224,6 +1225,7 @@ When ARG is 2, jump to tags in current dir."
       (backward-char))))
 
 (defun lpy-occur ()
+  "Swipe the current defun."
   (interactive)
   (swiper--init)
   (unwind-protect
@@ -1251,6 +1253,8 @@ When ARG is 2, jump to tags in current dir."
       (goto-char swiper--opoint))))
 
 (defun lpy-follow-dbg-links-filter (output)
+  "Filter OUTPUT.
+Suitable for `comint-output-filter-functions'."
   (let ((regex "^  File \"\\([^\"]+\\)\", line [0-9]+"))
     (when (string-match regex output)
       ;; wait for `comint-output-filter' to insert the string into the buffer
@@ -1264,6 +1268,7 @@ When ARG is 2, jump to tags in current dir."
   output)
 
 (defun lpy-switch-to-shell ()
+  "Switch to the current process buffer."
   (interactive)
   (let ((buffer (process-buffer (lispy--python-proc))))
     (if buffer
@@ -1277,6 +1282,7 @@ When ARG is 2, jump to tags in current dir."
       (pop-to-buffer "*Python*"))))
 
 (defun lpy-yank ()
+  "Yank while intelligently quoting strings."
   (interactive)
   (let (bnd)
     (if (and (setq bnd (lispy--bounds-string))
@@ -1292,6 +1298,7 @@ When ARG is 2, jump to tags in current dir."
       (yank))))
 
 (defun lpy-eval-buffer ()
+  "Eval the current buffer."
   (interactive)
   (if (process-live-p (lispy--python-proc))
       (let ((res
@@ -1308,6 +1315,7 @@ When ARG is 2, jump to tags in current dir."
     (error "No process")))
 
 (defun lpy-iedit ()
+  "Edit all occurences of the current symbol."
   (interactive)
   (if (or current-prefix-arg
           (let ((re (concat "\\_<" (ivy-thing-at-point) "\\_>"))
