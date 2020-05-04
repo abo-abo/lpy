@@ -58,7 +58,7 @@
 
 (require 'lispy)
 (require 'le-python)
-(require 'soap)
+(require 'lpy-soap)
 (require 'flyspell nil t)
 (require 'zoutline)
 
@@ -245,7 +245,7 @@ Use this to detect a space elsewhere."
            ((or (lpy-line-left-p)
                 (and (lispy-bolp)
                      (not (memq last-command '(self-insert-command
-                                               soap-command
+                                               lpy-soap-command
                                                newline)))
                      (or (looking-at lispy-outline-header)
                          (looking-at lispy-outline))))
@@ -858,7 +858,7 @@ Call this twice to go back."
         ((lispy--in-string-or-comment-p)
          (self-insert-command 1))
         (t
-         (soap-command))))
+         (lpy-soap-command))))
 
 (defun lpy-barf ()
   "Barf out an item from the region."
@@ -880,7 +880,7 @@ Call this twice to go back."
         ((lispy--in-string-or-comment-p)
          (self-insert-command 1))
         (t
-         (soap-command))))
+         (lpy-soap-command))))
 
 (defun lpy-open ()
   "Insert a newline after the current marked line."
@@ -1392,12 +1392,12 @@ Suitable for `comint-output-filter-functions'."
     (lpy-define-key map "K" 'lispy-outline-prev)
     (lpy-define-key map "N" 'lispy-narrow)
     (lpy-define-key map "W" 'lispy-widen)
-    (define-key map ">" 'soap-command)
-    (define-key map "<" 'soap-command)
+    (define-key map ">" 'lpy-soap-command)
+    (define-key map "<" 'lpy-soap-command)
     (dolist (x (number-sequence 0 9))
       (lpy-define-key map (format "%d" x) 'digit-argument))
     (dolist (x '("+" "-" "%" "&" "|" "=" ","))
-      (define-key map x 'soap-command))
+      (define-key map x 'lpy-soap-command))
     map))
 
 ;;;###autoload

@@ -1,4 +1,4 @@
-;;; soap.el --- Smart Operator a posteriori
+;;; lpy-soap.el --- Smart Operator a posteriori
 
 ;; Copyright (C) 2015-2020 Oleh Krehel
 
@@ -31,24 +31,12 @@
 
 ;;; Code:
 
-(defvar soap-alist
+(require 'lispy)
+
+(defvar lpy-soap-alist
   '("\\+" "-" "\\*" "/" "%" "&" "|" "<" "=" ">"))
 
-(defun soap-in-string-or-comment-p ()
-  "Test if point is inside a string or a comment."
-  (or
-   ;; proper
-   (let ((beg (nth 8 (syntax-ppss))))
-     (and beg
-          (or (eq (char-after beg) ?\")
-              (eq (char-after beg) ?\')
-              (comment-only-p beg (point)))
-          beg))
-   ;; works for `matlab-mode'
-   (eq (get-text-property (point) 'face)
-       'font-lock-string-face)))
-
-(defun soap-default-action (op)
+(defun lpy-soap-default-action (op)
   "Insert OP, possibly with spaces around it."
   (delete-horizontal-space t)
   (let ((op-p nil)
@@ -58,7 +46,7 @@
       (setq one-char-back t))
     (setq op-p
           (catch 'return
-            (dolist (front soap-alist)
+            (dolist (front lpy-soap-alist)
               (when (looking-at front)
                 (throw 'return t)))))
     (when (and (or op-p (not (and (bolp) (eolp))))
@@ -71,48 +59,16 @@
   (unless (eq (char-after) ?\ )
     (insert " ")))
 
-(defun soap-after-string-p (str)
-  "Return t if the string before point is STR."
-  (string=
-   (buffer-substring
-    (max
-     (- (point) (length str))
-     (point-min))
-    (point))
-   str))
-
-(defun soap-op-> ()
-  "Action for >."
-  (interactive)
-  (cond ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)" (line-beginning-position))
-         (delete-region (match-beginning 1)
-                        (match-end 1))
-         (insert "->"))
-        ((eq major-mode 'sml-mode)
-         (cond ((soap-after-string-p ":")
-                (insert "> "))
-               ((soap-after-string-p "- ")
-                (delete-char -1)
-                (insert "> "))
-               (t
-                (soap-default-action ">"))))
-        ((looking-back "\\(?:this\\)?\\(-\\| \\- \\)" (line-beginning-position))
-         (delete-region (match-beginning 1)
-                        (match-end 1))
-         (insert "->"))
-        (t
-         (soap-default-action ">"))))
-
-(defun soap-command (&optional arg)
+(defun lpy-soap-command (&optional arg)
   "Similar to `self-insert-command' with ARG, except handles whitespace."
   (interactive "p")
   (setq arg (or arg 1))
   (let ((op (this-command-keys)))
-    (cond ((and (soap-in-string-or-comment-p)
+    (cond ((and (lispy--in-string-or-comment-p)
                 (member op (list "+" "-" "*" "/" "%" "&" "|" "=")))
            (self-insert-command arg))
 
-          ((soap-after-string-p "(")
+          ((lispy-after-string-p "(")
            (insert op))
 
           ((string= op "+")
@@ -126,11 +82,11 @@
                 (insert "++")))
              ((looking-back "\\s-\\|=\\|\\+\\|\\([0-9.]+e\\)" (line-beginning-position))
               (insert "+"))
-             (t (soap-default-action op))))
+             (t (lpy-soap-default-action op))))
 
           ((string= op "-")
            (cond
-             ((soap-after-string-p " - ")
+             ((lispy-after-string-p " - ")
               (backward-delete-char 3)
               (insert "--"))
              ((or (looking-at "[\\s-]*>") (bolp))
@@ -139,10 +95,10 @@
               (insert op))
              ((looking-back "[:[]" (line-beginning-position))
               (insert op))
-             (t (soap-default-action op))))
+             (t (lpy-soap-default-action op))))
 
           ((string= op "*")
-           (cond ((soap-after-string-p " * ")
+           (cond ((lispy-after-string-p " * ")
                   (delete-char -3)
                   (insert "**"))
                  ((or (looking-back "(\\|[\t :.]+" (line-beginning-position))
@@ -154,24 +110,24 @@
                   (insert op))
 
                  (t
-                  (soap-default-action op))))
+                  (lpy-soap-default-action op))))
 
           ((string= op "/")
-           (cond ((or (soap-after-string-p ".")
+           (cond ((or (lispy-after-string-p ".")
                       (looking-back "^#.*" (line-beginning-position)))
                   (insert op))
                  ((and (looking-back "^ *" (line-beginning-position))
                        (memq major-mode '(c++-mode c-mode)))
                   (insert "// "))
                  (t
-                  (soap-default-action op))))
+                  (lpy-soap-default-action op))))
 
           ((and (string= op "%")
                 (looking-back "[ \t]+" (line-beginning-position)))
            (insert op))
 
           ((string= op "&")
-           (cond ((soap-after-string-p "&")
+           (cond ((lispy-after-string-p "&")
                   (backward-delete-char 1)
                   (insert " && "))
                  (t
@@ -187,10 +143,31 @@
            (insert ": "))
 
           ((string= op ">")
-           (soap-op->))
+           (cond ((looking-back
+                   "\\(?:this\\)?\\(-\\| \\- \\)"
+                   (line-beginning-position))
+                  (delete-region
+                   (match-beginning 1)
+                   (match-end 1))
+                  (insert "->"))
+                 ((eq major-mode 'sml-mode)
+                  (cond ((lispy-after-string-p ":")
+                         (insert "> "))
+                        ((lispy-after-string-p "- ")
+                         (delete-char -1)
+                         (insert "> "))
+                        (t (lpy-soap-default-action ">"))))
+                 ((looking-back
+                   "\\(?:this\\)?\\(-\\| \\- \\)"
+                   (line-beginning-position))
+                  (delete-region
+                   (match-beginning 1)
+                   (match-end 1))
+                  (insert "->"))
+                 (t (lpy-soap-default-action ">"))))
 
           ((string= op "<")
-           (soap-default-action op))
+           (lpy-soap-default-action op))
 
           ((string= op "=")
            (cond
@@ -198,24 +175,24 @@
                    (looking-back "[,(][\n ]*\\(\\sw\\|\\s_\\)+" (line-beginning-position -1)))
               ;; keyword argument in Python
               (insert "="))
-             ((soap-after-string-p "!")
+             ((lispy-after-string-p "!")
               (backward-delete-char 1)
               (just-one-space)
               (insert "!= "))
-             ((soap-after-string-p "<")
+             ((lispy-after-string-p "<")
               (delete-char -1)
               (insert " <= "))
              ((looking-back "\\sw\\( ?\\+ ?\\)" (line-beginning-position))
               (delete-region (match-beginning 1)
                              (match-end 1))
               (insert " += "))
-             ((soap-after-string-p "[")
+             ((lispy-after-string-p "[")
               (insert op))
              (t
-              (soap-default-action op))))
+              (lpy-soap-default-action op))))
           (t
-           (soap-default-action op)))))
+           (lpy-soap-default-action op)))))
 
-(provide 'soap)
+(provide 'lpy-soap)
 
-;;; soap.el ends here
+;;; lpy-soap.el ends here
