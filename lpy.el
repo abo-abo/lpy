@@ -1314,9 +1314,12 @@ Suitable for `comint-output-filter-functions'."
           (lispy-message lispy-eval-error)))
     (error "No process")))
 
+(declare-function iedit-mode "ext:iedit")
+
 (defun lpy-iedit ()
   "Edit all occurences of the current symbol."
   (interactive)
+  (require 'iedit)
   (if (or current-prefix-arg
           (let ((re (concat "\\_<" (ivy-thing-at-point) "\\_>"))
                 (pt (point)))
