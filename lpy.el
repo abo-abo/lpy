@@ -1118,30 +1118,36 @@ When ARG is 2, jump to tags in current dir."
     (unless (bolp)
       (backward-char))))
 
-(defun lpy-kill-line ()
-  "Kill the current line."
-  (interactive)
+(defun lpy-kill-line (&optional arg)
+  "Kill the current line.
+When in a string, kill until the end of the string.
+When ARG is non-nil, kill until the beginning of the string."
+  (interactive "P")
   (let (bnd)
     (cond
-      ((and (setq bnd (lispy--bounds-string))
-            (not (eq (point) (car bnd))))
-       (if (member (buffer-substring-no-properties (- (cdr bnd) 3) (cdr bnd))
-                   '("\"\"\"" "'''"))
-           (if (> (cdr bnd) (line-end-position))
-               (kill-region (point) (+ (line-end-position)
-                                       (if (eolp) 1 0)))
-             (kill-region (point) (- (cdr bnd) 3)))
-         (kill-region
-          (point)
-          (1- (cdr bnd)))))
-      ((bolp)
-       (kill-line))
-      ((eolp)
-       (delete-region (line-beginning-position)
-                      (1+ (point)))
-       (back-to-indentation))
-      (t
-       (kill-line)))))
+     ((and (setq bnd (lispy--bounds-string))
+           (not (eq (point) (car bnd))))
+      (if (member (buffer-substring-no-properties (- (cdr bnd) 3) (cdr bnd))
+                  '("\"\"\"" "'''"))
+          (if (> (cdr bnd) (line-end-position))
+              (kill-region (point) (+ (line-end-position)
+                                      (if (eolp) 1 0)))
+            (kill-region (point) (- (cdr bnd) 3)))
+        (if arg
+            (kill-region
+             (1+ (car bnd))
+             (point))
+          (kill-region
+           (point)
+           (1- (cdr bnd))))))
+     ((bolp)
+      (kill-line))
+     ((eolp)
+      (delete-region (line-beginning-position)
+                     (1+ (point)))
+      (back-to-indentation))
+     (t
+      (kill-line)))))
 
 (defun lpy-delete ()
   "Delete the current item."
