@@ -1295,7 +1295,8 @@ Suitable for `comint-output-filter-functions'."
              (not (= (point) (car bnd))))
         (cond
           ((string= (buffer-substring (car bnd)
-                                      (+ 3 (car bnd))) "\"\"\"")
+                                      (min (point-max)
+                                           (+ 3 (car bnd)))) "\"\"\"")
            (insert (current-kill 0)))
           ((eq (char-after (car bnd)) ?\")
            (insert (replace-regexp-in-string "\"" "\\\\\"" (current-kill 0))))
