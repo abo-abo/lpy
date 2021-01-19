@@ -2,6 +2,9 @@
 
 Deceptively minimalistic Python IDE for GNU Emacs.
 
+* Setup
+Install from MELPA and enable =lpy-mode=.
+
 * Introduction
 Q: How many keys does it take to define/redefine a Python function?
 A: One - ~e~.
