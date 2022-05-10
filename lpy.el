@@ -448,12 +448,13 @@ Use this to detect a space elsewhere."
                                   (while (and (re-search-forward
                                                (format "^%s[^ \n]" (make-string (- offset 4) 32))
                                                nil t)
+                                              (not (lispy-looking-back ")"))
                                               (setq match-found t)
                                               (lispy--in-string-or-comment-p)))
                                   (if match-found
                                       (point)))
                                 (point-max)))))
-                    (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                    (regex (format "^%s[^ \n)]" (buffer-substring-no-properties
                                                 (line-beginning-position) (point))))
                     (old-point (point))
                     bnd)
@@ -610,9 +611,10 @@ When on an outline, add an outline below."
                            (save-excursion
                              (while (and (re-search-backward
                                           (format "^%s[^ \n]" (make-string (- offset 4) 32)))
-                                         (lispy--in-string-or-comment-p)))
+                                         (or (looking-at ")")
+                                             (lispy--in-string-or-comment-p))))
                              (point))))
-                  (regex (format "^%s[^ \n]" (buffer-substring-no-properties
+                  (regex (format "^%s[^ \n)]" (buffer-substring-no-properties
                                               (line-beginning-position) (point))))
                   bnd)
              (catch 'done
@@ -849,12 +851,15 @@ Call this twice to go back."
 
 (defun lpy-slurp ()
   "Slurp in an item into the region."
-  (cond ((and (region-active-p)
-              (lpy-listp))
-         (cond ((lpy-arg-rightp)
-                (forward-sexp))
-               ((lpy-arg-leftp)
-                (backward-sexp))))
+  (interactive)
+  (cond ((region-active-p)
+         (cond ((eolp)
+                (end-of-line 2))
+               ((lpy-listp)
+                (cond ((lpy-arg-rightp)
+                       (forward-sexp))
+                      ((lpy-arg-leftp)
+                       (backward-sexp))))))
         ((lispy--in-string-or-comment-p)
          (self-insert-command 1))
         (t
@@ -983,6 +988,17 @@ When ARG is 2, jump to tags in current dir."
     (unless (or (bolp) (looking-at " "))
       (backward-char 1))))
 
+(defun lpy-goto-action (x)
+  (goto-char (point-min))
+  (forward-line (1- (cadr x))))
+
+(defun lpy-goto ()
+  (interactive)
+  (let ((defs (lispy--py-to-el (format "lp.definitions('%s')" (buffer-file-name)))))
+    (ivy-read "tag: " defs
+              :action #'lpy-goto-action
+              :caller 'lpy-goto)))
+
 (defun lpy-tag-name (tag)
   "Return a pretty name for TAG."
   (let* ((class (semantic-tag-class tag))
@@ -1006,15 +1022,15 @@ When ARG is 2, jump to tags in current dir."
                         (end)
                         (ov (semantic-tag-overlay tag))
                         (buf (cond
-                               ((and (overlayp ov)
-                                     (bufferp (overlay-buffer ov)))
-                                (setq beg (overlay-start ov))
-                                (setq end (overlay-end ov))
-                                (overlay-buffer ov))
-                               ((arrayp ov)
-                                (setq beg (aref ov 0))
-                                (setq end (aref ov 1))
-                                (current-buffer))))
+                              ((and (overlayp ov)
+                                    (bufferp (overlay-buffer ov)))
+                               (setq beg (overlay-start ov))
+                               (setq end (overlay-end ov))
+                               (overlay-buffer ov))
+                              ((arrayp ov)
+                               (setq beg (aref ov 0))
+                               (setq end (aref ov 1))
+                               (current-buffer))))
                         str)
                    (when (and buf
                               (setq str
@@ -1307,19 +1323,25 @@ Suitable for `comint-output-filter-functions'."
 (defun lpy-eval-buffer ()
   "Eval the current buffer."
   (interactive)
-  (if (process-live-p (lispy--python-proc))
-      (let ((res
-             (progn
-               (lispy--eval
-                (format "import os; os.chdir('%s')" default-directory))
-               (lispy--eval
-                (buffer-substring-no-properties
-                 (point-min)
-                 (point-max))))))
-        (if res
-            (lispy-message res)
-          (lispy-message lispy-eval-error)))
-    (error "No process")))
+  (condition-case err
+      (if (process-live-p (lispy--python-proc))
+          (let ((res
+                 (progn
+                   (lispy--eval
+                    (format "lp.chfile('%s')" (buffer-file-name)))
+                   (python-shell-send-string-no-output
+                    (buffer-substring-no-properties
+                     (point-min)
+                     (point-max))
+                    (lispy--python-proc)))))
+            (setq res (concat res (lispy--eval
+                                   (format "lp.reload_module('%s')" (buffer-file-name)))))
+            (if (string= "" res)
+                (lispy-message "(ok)")
+              (lispy-message res)))
+        (error "No process"))
+    (eval-error
+     (lispy-message (cdr err)))))
 
 (declare-function iedit-mode "ext:iedit")
 
@@ -1402,7 +1424,7 @@ Suitable for `comint-output-filter-functions'."
     (lpy-define-key map "K" 'lispy-outline-prev)
     (lpy-define-key map "N" 'lispy-narrow)
     (lpy-define-key map "W" 'lispy-widen)
-    (define-key map ">" 'lpy-soap-command)
+    (define-key map ">" 'lpy-slurp)
     (define-key map "<" 'lpy-soap-command)
     (dolist (x (number-sequence 0 9))
       (lpy-define-key map (format "%d" x) 'digit-argument))

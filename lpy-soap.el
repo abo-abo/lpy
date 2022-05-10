@@ -149,7 +149,9 @@
                   (delete-region
                    (match-beginning 1)
                    (match-end 1))
-                  (insert "->"))
+                  (if (eq major-mode 'python-mode)
+                      (insert " -> ")
+                    (insert "->")))
                  ((eq major-mode 'sml-mode)
                   (cond ((lispy-after-string-p ":")
                          (insert "> "))
