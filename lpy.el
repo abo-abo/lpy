@@ -192,20 +192,23 @@ Use this to detect a space elsewhere."
                (outline-flag-region eoh eos nil)
              (outline-flag-region eoh eos t))))
         ((region-active-p)
-         (if (lpy-listp)
-             (let ((beg (region-beginning))
-                   (end (region-end)))
-               (if (and (save-excursion
-                          (goto-char beg)
-                          (lpy-arg-leftp))
-                        (save-excursion
-                          (goto-char end)
-                          (lpy-arg-rightp)))
-                   (when (save-excursion
-                           (goto-char beg)
-                           (re-search-forward "=" nil end))
-                     (set-mark (1+ beg))
-                     (goto-char (match-beginning 0)))))))
+         (cond ((lpy-listp)
+                (let ((beg (region-beginning))
+                      (end (region-end)))
+                  (if (and (save-excursion
+                             (goto-char beg)
+                             (lpy-arg-leftp))
+                           (save-excursion
+                             (goto-char end)
+                             (lpy-arg-rightp)))
+                      (when (save-excursion
+                              (goto-char beg)
+                              (re-search-forward "=" nil end))
+                        (set-mark (1+ beg))
+                        (goto-char (match-beginning 0))))))
+               ((looking-at " \\(?:if\\|elif\\) \\([^\n]+\\):")
+                (lispy--mark (cons (match-beginning 1)
+                                   (match-end 1))))))
         ((looking-at "(")
          (let ((beg (point))
                (end (save-excursion (forward-list)))
