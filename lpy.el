@@ -1340,6 +1340,7 @@ Suitable for `comint-output-filter-functions'."
       (if (process-live-p (lispy--python-proc))
           (let ((res
                  (progn
+                   (lispy-python-middleware-reload)
                    (lispy--eval
                     (format "lp.chfile('%s')" (buffer-file-name)))
                    (python-shell-send-string-no-output
