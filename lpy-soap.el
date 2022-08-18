@@ -169,14 +169,26 @@
                  (t (lpy-soap-default-action ">"))))
 
           ((string= op "<")
-           (lpy-soap-default-action op))
+           (if (lispy--in-string-or-comment-p)
+               (insert op)
+             (lpy-soap-default-action op)))
 
           ((string= op "=")
            (cond
-             ((and (eq major-mode 'python-mode)
-                   (looking-back "[,(][\n ]*\\(\\sw\\|\\s_\\)+" (line-beginning-position -1)))
+            ((eq major-mode 'python-mode)
+             (cond
               ;; keyword argument in Python
-              (insert "="))
+              ((looking-back "[,(][\n ]*\\(\\sw\\|\\s_\\)+" (line-beginning-position -1))
+               (insert op))
+              ;; walrus
+              ((looking-back ":" (line-beginning-position))
+               (delete-char -1)
+               (insert " := "))
+              ((looking-back "!" (line-beginning-position))
+               (delete-char -1)
+               (insert " != "))
+              (t
+               (lpy-soap-default-action op))))
              ((lispy-after-string-p "!")
               (backward-delete-char 1)
               (just-one-space)
