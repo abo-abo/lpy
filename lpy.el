@@ -865,7 +865,14 @@ Call this twice to go back."
                 (cond ((lpy-arg-rightp)
                        (forward-sexp))
                       ((lpy-arg-leftp)
-                       (backward-sexp))))))
+                       (backward-sexp))))
+               (t
+                (let ((regex  "[[.]"))
+                  (when (looking-at regex)
+                    (forward-char))
+                  (if (re-search-forward regex (line-end-position) t)
+                      (backward-char)
+                    (end-of-line))))))
         ((lispy--in-string-or-comment-p)
          (self-insert-command 1))
         (t
