@@ -449,7 +449,7 @@ Use this to detect a space elsewhere."
                                (or
                                 (let ((match-found nil))
                                   (while (and (re-search-forward
-                                               (format "^%s[^ \n]" (make-string (- offset 4) 32))
+                                               (format "^%s[^ \n]" (make-string (- offset lpy-offset) 32))
                                                nil t)
                                               (not (lispy-looking-back ")"))
                                               (setq match-found t)
@@ -613,7 +613,7 @@ When on an outline, add an outline below."
                                (error (point-min)))
                            (save-excursion
                              (while (and (re-search-backward
-                                          (format "^%s[^ \n]" (make-string (- offset 4) 32)))
+                                          (format "^%s[^ \n]" (make-string (- offset lpy-offset) 32)))
                                          (or (looking-at ")")
                                              (lispy--in-string-or-comment-p))))
                              (point))))
@@ -648,6 +648,9 @@ When on an outline, add an outline below."
         (t
          (self-insert-command 1))))
 
+(defvar-local lpy-offset 4
+  "Offset between indentation levels.")
+
 (defun lpy-left (arg)
   "Go left ARG times."
   (interactive "p")
@@ -660,7 +663,7 @@ When on an outline, add an outline below."
          (let ((offset (current-column)))
            (if (= offset 0)
                (outline-back-to-heading)
-             (let ((regex (format "^%s[^ \n]" (make-string (- offset 4) 32)))
+             (let ((regex (format "^%s[^ \n]" (make-string (- offset lpy-offset) 32)))
                    (match-found nil))
                (while (and (re-search-backward regex nil t)
                            (setq match-found t)
@@ -682,7 +685,7 @@ When on an outline, add an outline below."
              (backward-char))))
         ((lpy-line-left-p)
          (let* ((cur-offset (if (bolp) 0 (1+ (current-column))))
-                (new-offset (+ cur-offset 4))
+                (new-offset (+ cur-offset lpy-offset))
                 (regex (format "^%s[^ \n]" (make-string new-offset 32)))
                 (pt (point))
                 success)
@@ -991,16 +994,16 @@ When ARG is 2, jump to tags in current dir."
     (unless (or (bolp) (looking-at " "))
       (backward-char 1))))
 
-(defun lpy-goto-action (x)
-  (goto-char (point-min))
-  (forward-line (1- (cadr x))))
-
 (defun lpy-goto ()
   (interactive)
   (let ((defs (lispy--py-to-el (format "lp.definitions('%s')" (buffer-file-name)))))
     (ivy-read "tag: " defs
               :action #'lpy-goto-action
               :caller 'lpy-goto)))
+
+(defun lpy-goto-action (x)
+  (goto-char (point-min))
+  (forward-line (1- (cadr x))))
 
 (defun lpy-tag-name (tag)
   "Return a pretty name for TAG."
@@ -1450,7 +1453,11 @@ Suitable for `comint-output-filter-functions'."
         (setq-local fill-forward-paragraph-function 'lpy-fill-forward-paragraph-function)
         (setq-local completion-at-point-functions '(lispy-python-completion-at-point t))
         (setq-local lispy-no-space t)
-        (font-lock-add-keywords major-mode lpy-font-lock-keywords))
+        (font-lock-add-keywords major-mode lpy-font-lock-keywords)
+        (setq-local lpy-offset
+                    (if (eq major-mode 'js2-mode)
+                        2
+                      4)))
     (font-lock-remove-keywords major-mode lpy-font-lock-keywords)))
 
 (provide 'lpy)
