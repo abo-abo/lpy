@@ -900,6 +900,21 @@ Call this twice to go back."
         (t
          (lpy-soap-command))))
 
+(defun lpy-plus ()
+  (interactive)
+  (if (region-active-p)
+      (er/expand-region 1)
+    (lpy-soap-command)))
+
+(defun lpy-minus ()
+  (interactive)
+  (cond ((region-active-p)
+         (er/expand-region -1))
+        ((eq major-mode 'yaml-mode)
+         (self-insert-command 1))
+        (t
+         (lpy-soap-command))))
+
 (defun lpy-open ()
   "Insert a newline after the current marked line."
   (interactive)
@@ -1440,9 +1455,11 @@ Suitable for `comint-output-filter-functions'."
     (lpy-define-key map "W" 'lispy-widen)
     (define-key map ">" 'lpy-slurp)
     (define-key map "<" 'lpy-soap-command)
+    (define-key map "+" 'lpy-plus)
+    (define-key map "-" 'lpy-minus)
     (dolist (x (number-sequence 0 9))
       (lpy-define-key map (format "%d" x) 'digit-argument))
-    (dolist (x '("+" "-" "%" "&" "|" "=" ","))
+    (dolist (x '("%" "&" "|" "=" ","))
       (define-key map x 'lpy-soap-command))
     map))
 

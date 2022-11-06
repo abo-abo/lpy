@@ -92,6 +92,9 @@ Q: How do I insert the result of the eval into the buffer as a
 comment?
 A: ~2e~.
 
+Q: Howto easily select things to eval?
+A: ~M-m~ to get into special. Then ~+~ and ~-~ to expand/shrink selection with =expand-region=.
+
 ** Debugging
 Q: How do I step into an expression?
 A: ~xj~.
