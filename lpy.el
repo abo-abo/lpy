@@ -1016,16 +1016,32 @@ When ARG is 2, jump to tags in current dir."
     (unless (or (bolp) (looking-at " "))
       (backward-char 1))))
 
+(defvar lpy-goto-history nil)
+
+(defun lpy--current-symbol ()
+  (cl-case major-mode
+    (python-mode
+     (python-info-current-defun))
+    (yaml-mode
+     (save-excursion
+       (back-to-indentation)
+       (thing-at-point 'symbol)))))
+
 (defun lpy-goto ()
   (interactive)
   (let ((defs (lispy--py-to-el (format "lp.definitions('%s')" (buffer-file-name)))))
     (ivy-read "tag: " defs
               :action #'lpy-goto-action
+              :preselect (lpy--current-symbol)
+              :history 'lpy-goto-history
               :caller 'lpy-goto)))
 
 (defun lpy-goto-action (x)
   (goto-char (point-min))
-  (forward-line (1- (cadr x))))
+  (forward-line (1- (cadr x)))
+  (when (looking-at " ")
+    (skip-chars-forward " ")
+    (backward-char 1)))
 
 (defun lpy-tag-name (tag)
   "Return a pretty name for TAG."
@@ -1480,7 +1496,7 @@ Suitable for `comint-output-filter-functions'."
         (setq-local lispy-no-space t)
         (font-lock-add-keywords major-mode lpy-font-lock-keywords)
         (setq-local lpy-offset
-                    (if (eq major-mode 'js2-mode)
+                    (if (memq major-mode '(js2-mode yaml-mode))
                         2
                       4)))
     (font-lock-remove-keywords major-mode lpy-font-lock-keywords)))
