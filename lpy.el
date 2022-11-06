@@ -1175,8 +1175,11 @@ When ARG is 2, jump to tags in current dir."
            (looking-back " +" (line-beginning-position)))
       (beginning-of-line)
     (back-to-indentation)
-    (unless (bolp)
-      (backward-char))))
+    (cond ((looking-back "^ +" (line-beginning-position))
+           (backward-char))
+          ((bolp))
+          (t
+           (beginning-of-line)))))
 
 (defun lpy-kill-line (&optional arg)
   "Kill the current line.
