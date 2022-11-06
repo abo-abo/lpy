@@ -1410,10 +1410,25 @@ Suitable for `comint-output-filter-functions'."
       (iedit-mode)
     (iedit-mode 0)))
 
+(defun lpy-import-last ()
+  "Import the last symbol stored by `lispy-store-region-and-buffer'."
+  (interactive)
+  (let* ((buffer (get 'lispy-store-bounds 'buffer))
+         (region (get 'lispy-store-bounds 'region))
+         (code (with-current-buffer buffer
+                 (lispy--string-dwim region)))
+         (temp-file-name (python-shell--save-temp-file code)))
+    (insert
+     (lispy--eval-python-plain
+      (format "lp.generate_import('%s','%s')"
+              temp-file-name
+              (expand-file-name (buffer-file-name buffer)))))))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-o") 'lpy-back-to-special)
     (define-key map (kbd "M-i") 'lpy-iedit)
+    (define-key map (kbd "M-r i") 'lpy-import-last)
     (define-key map (kbd "C-y") 'lpy-yank)
     (define-key map (kbd "C-c C-z") 'lpy-switch-to-shell)
     (define-key map (kbd "C-c C-c") 'lispy-eval-current-outline)
