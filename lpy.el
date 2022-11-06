@@ -1424,6 +1424,15 @@ Suitable for `comint-output-filter-functions'."
               temp-file-name
               (expand-file-name (buffer-file-name buffer)))))))
 
+(defun lpy-eval ()
+  "Eval expression."
+  (interactive)
+  (let* ((str (lispy-eval-python-str))
+         (res (lispy--eval-python str t)))
+    (when lispy-eval-output
+      (setq res (concat lispy-eval-output res)))
+    (lispy-message res)))
+
 (defvar lpy-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-o") 'lpy-back-to-special)
@@ -1467,7 +1476,7 @@ Suitable for `comint-output-filter-functions'."
     (lpy-define-key map "m" 'lpy-mark)
     (lpy-define-key map "n" 'lispy-new-copy)
     (lpy-define-key map "o" 'lpy-open)
-    (lpy-define-key map "p" 'self-insert-command)
+    (lpy-define-key map "p" 'lpy-eval)
     (lpy-define-key map "q" 'lpy-avy)
     (lpy-define-key map "r" 'self-insert-command)
     (lpy-define-key map "s" 'self-insert-command)
