@@ -1205,7 +1205,8 @@ When ARG is 2, jump to tags in current dir."
            (backward-char))
           ((bolp))
           (t
-           (beginning-of-line)))))
+           (let ((inhibit-field-text-motion t))
+             (beginning-of-line))))))
 
 (defun lpy-kill-line (&optional arg)
   "Kill the current line.
