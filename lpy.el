@@ -690,8 +690,13 @@ When on an outline, add an outline below."
                 (new-offset (+ cur-offset lpy-offset))
                 (regex (format "^%s[^ \n]" (make-string new-offset 32)))
                 (pt (point))
+                (end (save-excursion
+                       (end-of-defun)
+                       (if (<= (- pt (point)) 0)
+                           (point-max)
+                         (point))))
                 success)
-           (while (and (re-search-forward regex (cdr (zo-bnd-subtree)) t)
+           (while (and (re-search-forward regex end t)
                        (if (lispy--in-comment-p)
                            t
                          (setq success t)
