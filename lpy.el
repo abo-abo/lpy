@@ -688,7 +688,7 @@ When on an outline, add an outline below."
         ((lpy-line-left-p)
          (let* ((cur-offset (if (bolp) 0 (1+ (current-column))))
                 (new-offset (+ cur-offset lpy-offset))
-                (regex (format "^%s[^ \n]" (make-string new-offset 32)))
+                (regex (format "^ \\{%d,\\}[^ \n]" new-offset))
                 (pt (point))
                 (end (save-excursion
                        (end-of-defun)
