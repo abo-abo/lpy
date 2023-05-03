@@ -909,15 +909,20 @@ Call this twice to go back."
 
 (defun lpy-plus ()
   (interactive)
-  (if (region-active-p)
-      (er/expand-region 1)
-    (lpy-soap-command)))
+  (cond ((region-active-p)
+         (er/expand-region 1))
+        ((lispy--in-string-p)
+         (self-insert-command 1))
+        (t
+         (lpy-soap-command))))
 
 (defun lpy-minus ()
   (interactive)
   (cond ((region-active-p)
          (er/expand-region -1))
         ((eq major-mode 'yaml-mode)
+         (self-insert-command 1))
+        ((lispy--in-string-p)
          (self-insert-command 1))
         (t
          (lpy-soap-command))))
