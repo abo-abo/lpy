@@ -947,13 +947,27 @@ Call this twice to go back."
 (defun lpy-meta-return ()
   "Insert a new heading."
   (interactive)
-  (unless (bolp)
-    (newline))
-  (insert lispy-outline-header
-          (make-string (max (lispy-outline-level) 1)
-                       ?\*)
-          " ")
-  (end-of-line))
+  (cond
+   ((eq major-mode 'python-mode)
+    (unless (bolp)
+      (newline))
+    (insert lispy-outline-header
+            (make-string (max (lispy-outline-level) 1)
+                         ?\*)
+            " ")
+    (end-of-line))
+
+   ((eq major-mode 'yaml-mode)
+    (let ((prefix
+           (save-excursion
+             (back-to-indentation)
+             (buffer-substring-no-properties
+              (line-beginning-position)
+              (if (looking-at "- ")
+                  (match-end 0)
+                (point))))))
+      (newline)
+      (insert prefix)))))
 
 (defun lpy-clean ()
   "Clean up the evaluation results in the current buffer."
