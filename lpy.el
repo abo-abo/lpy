@@ -1405,12 +1405,12 @@ Suitable for `comint-output-filter-functions'."
           (let ((res
                  (progn
                    (lispy-python-middleware-reload)
-                   (lispy--eval
-                    (format "lp.chfile('%s')" (buffer-file-name)))
                    (python-shell-send-string-no-output
-                    (buffer-substring-no-properties
-                     (point-min)
-                     (point-max))
+                    (concat
+                     ;; (format "lp.chfile('%s')\n" (buffer-file-name))
+                     (buffer-substring-no-properties
+                      (point-min)
+                      (point-max)))
                     (lispy--python-proc)))))
             (setq res (concat res (lispy--eval
                                    (format "lp.reload_module('%s')" (buffer-file-name)))))
