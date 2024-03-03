@@ -152,14 +152,16 @@ Use this to detect a space elsewhere."
 (defun lpy-line-left-p ()
   "Return t when in special position in Python."
   (or (and (bolp)
+           (not (nth 3 (syntax-ppss)))  ; not IN multiline string
            (not (or
                  (eolp)
-                 (looking-at " ")
+                 (looking-at " [^ ]")
                  (memq last-command '(lpy-space newline))
                  (looking-at "[ \n]*\\'"))))
       (and (looking-at " ")
            (looking-back "^ +" (line-beginning-position))
-           (not (= (mod (current-column) 4) 0)))))
+           (not (lispy--in-string-p))
+           (not (eq last-command 'lpy-space)))))
 
 (defun lpy-outline-add ()
   "Insert an outline below the current one."
